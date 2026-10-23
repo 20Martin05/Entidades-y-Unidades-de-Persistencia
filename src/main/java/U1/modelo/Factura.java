@@ -1,9 +1,10 @@
-package U1.entity;
+package U1.modelo;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,13 +25,13 @@ public class Factura {
     private LocalDate fecha;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private double subtotal;
+    private BigDecimal subtotal;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private double impuesto;
+    private BigDecimal impuesto;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private double total;
+    private BigDecimal total;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cliente_id", nullable = false)

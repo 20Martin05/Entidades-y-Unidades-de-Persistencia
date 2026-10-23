@@ -1,39 +1,31 @@
-package U1.entity;
+package U1.modelo;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
-// Entidad JPA que representa los registros de la tabla productos.
 @Entity
 @Table(name = "productos")
 @Getter
 @Setter
 public class Productos {
 
-    // Identificador generado automáticamente por PostgreSQL.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // Nombre comercial del producto.
-    @Column
+    @Column(nullable = false, length = 100)
     private String nombre;
 
-    // Precio unitario de venta.
-    @Column
-    private double precio;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precio;
 
-    // Cantidad disponible en inventario.
-    @Column
+    @Column(nullable = false)
     private int cantidad;
-
-    // Categoría a la que pertenece el producto.
-    @Column
-    private String categoria;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id")
@@ -46,17 +38,14 @@ public class Productos {
     @ManyToMany(mappedBy = "productos")
     private Set<Factura> facturas = new HashSet<>();
 
-    // Constructor requerido por JPA.
     public Productos() {
     }
 
-    // Constructor utilizado para crear productos desde la interfaz.
-    public Productos(int id, String nombre, double precio, int cantidad, String categoria) {
+    public Productos(int id, String nombre, BigDecimal precio, int cantidad) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.cantidad = cantidad;
-        this.categoria = categoria;
     }
 
     @Override
@@ -66,7 +55,6 @@ public class Productos {
                 ", nombre='" + nombre + '\'' +
                 ", precio=" + precio +
                 ", cantidad=" + cantidad +
-                ", categoria='" + categoria + '\'' +
                 '}';
     }
 }

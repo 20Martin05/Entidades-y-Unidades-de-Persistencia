@@ -1,4 +1,4 @@
-package U1.entity;
+package U1.modelo;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,10 +8,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "clientes")
+@Table(name = "proveedores")
 @Getter
 @Setter
-public class Cliente {
+public class Proveedor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -19,11 +19,8 @@ public class Cliente {
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column(nullable = false, length = 100)
-    private String apellido;
-
-    @Column(nullable = false, unique = true, length = 20)
-    private String cedula;
+    @Column(length = 100)
+    private String empresa;
 
     @Column(length = 20)
     private String telefono;
@@ -31,9 +28,15 @@ public class Cliente {
     @Column(length = 100)
     private String correo;
 
-    @OneToMany(mappedBy = "cliente")
-    private Set<Factura> facturas = new HashSet<>();
+    @Column(length = 255)
+    private String direccion;
 
-    public Cliente() {
+    @OneToMany(mappedBy = "proveedor")
+    private Set<Productos> productos = new HashSet<>();
+
+    @ManyToMany(mappedBy = "proveedores")
+    private Set<Categoria> categorias = new HashSet<>();
+
+    public Proveedor() {
     }
 }
