@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.1" xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd">
+
+    <!-- Unidad JPA usada por la aplicación para conectarse a PostgreSQL. -->
+    <persistence-unit name="postgres" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <!-- Entidad que Hibernate registra y mapea a la tabla productos. -->
+        <class>U1.entity.Productos</class>
+        <class>U1.entity.Categoria</class>
+        <class>U1.entity.Proveedor</class>
+        <class>U1.entity.Cliente</class>
+        <class>U1.entity.Factura</class>
+
+        <properties>
+            <!-- Datos de conexión a PostgreSQL -->
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/postgres"/>
+            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+            <!-- Reemplazar este marcador por la contraseña local de PostgreSQL. -->
+            <property name="jakarta.persistence.jdbc.password" value="PON_AQUI_TU_CONTRASEÑA"/>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+
+            <!-- Propiedades de Hibernate -->
+            <!-- Actualiza la estructura de la tabla sin eliminar los datos existentes. -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <!-- Muestra las consultas SQL en la salida de la aplicación. -->
+            <property name="hibernate.show_sql" value="true"/>
+            <!-- Da formato legible a las consultas SQL mostradas. -->
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+
+</persistence>
