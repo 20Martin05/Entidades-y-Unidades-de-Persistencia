@@ -2,6 +2,7 @@ package U1.controlador;
 
 import U1.modelo.Categoria;
 import U1.vista.VentanaEmpresa;
+import U1.util.ConexionJPA;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -12,8 +13,7 @@ import java.util.List;
 
 public class CategoriaControlador {
     private final VentanaEmpresa vista;
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("postgres");
-    private final EntityManager em = emf.createEntityManager();
+    private final EntityManager em = ConexionJPA.crearEntityManager();
 
     public CategoriaControlador(VentanaEmpresa vista) {
         this.vista = vista;
@@ -50,7 +50,8 @@ public class CategoriaControlador {
     }
 
     public void Cactualizar() {
-        int fila = vista.tbl_CCategorias.getSelectedRow();
+        int filaVista = vista.tbl_CCategorias.getSelectedRow();
+        int fila = filaVista >= 0 ? vista.tbl_CCategorias.convertRowIndexToModel(filaVista) : -1;
         if (fila == -1) {
             JOptionPane.showMessageDialog(vista, "Selecciona una categoría de la tabla primero");
             return;
@@ -84,7 +85,8 @@ public class CategoriaControlador {
     }
 
     public void Celiminar() {
-        int fila = vista.tbl_CCategorias.getSelectedRow();
+        int filaVista = vista.tbl_CCategorias.getSelectedRow();
+        int fila = filaVista >= 0 ? vista.tbl_CCategorias.convertRowIndexToModel(filaVista) : -1;
         if (fila == -1) {
             JOptionPane.showMessageDialog(vista, "Selecciona una categoría de la tabla primero");
             return;

@@ -3,6 +3,7 @@ package U1.controlador;
 import U1.modelo.Productos;
 import U1.modelo.Categoria;
 import U1.vista.VentanaEmpresa;
+import U1.util.ConexionJPA;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -14,12 +15,12 @@ import java.util.List;
 
 public class ProductosControlador {
     private final VentanaEmpresa vista;
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("postgres");
-    private final EntityManager em = emf.createEntityManager();
+    private final EntityManager em = ConexionJPA.crearEntityManager();
 
     public ProductosControlador(VentanaEmpresa vista) {
         this.vista = vista;
     }
+
 
     public void Plistar() {
         DefaultTableModel modelo = new DefaultTableModel(
@@ -58,7 +59,8 @@ public class ProductosControlador {
     }
 
     public void Pactualizar() {
-        int fila = vista.tbl_PProductos.getSelectedRow();
+        int filaVista = vista.tbl_PProductos.getSelectedRow();
+        int fila = filaVista >= 0 ? vista.tbl_PProductos.convertRowIndexToModel(filaVista) : -1;
         if (fila == -1) {
             JOptionPane.showMessageDialog(vista, "Selecciona un producto de la tabla primero");
             return;
@@ -103,7 +105,8 @@ public class ProductosControlador {
     }
 
     public void Peliminar() {
-        int fila = vista.tbl_PProductos.getSelectedRow();
+        int filaVista = vista.tbl_PProductos.getSelectedRow();
+        int fila = filaVista >= 0 ? vista.tbl_PProductos.convertRowIndexToModel(filaVista) : -1;
         if (fila == -1) {
             JOptionPane.showMessageDialog(vista, "Selecciona un producto de la tabla primero");
             return;

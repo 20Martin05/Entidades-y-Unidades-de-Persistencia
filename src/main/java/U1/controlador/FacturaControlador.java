@@ -1,6 +1,7 @@
 package U1.controlador;
 
 import U1.vista.VentanaEmpresa;
+import U1.util.ConexionJPA;
 import U1.modelo.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -12,19 +13,20 @@ import java.time.LocalDate;
 
 public class FacturaControlador {
     private final VentanaEmpresa vista;
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("postgres");
-    private final EntityManager em = emf.createEntityManager();
+    private final EntityManager em = ConexionJPA.crearEntityManager();
 
     public FacturaControlador(VentanaEmpresa vista) {
         this.vista = vista;
     }
 
     public void Flistar() {
+        vista.tbl_FFacturas.setRowSorter(null);
         DefaultTableModel m = new DefaultTableModel(
-                new String[]{"ID","Número","Fecha","Subtotal","Impuesto","Total","Cliente"}, 0);
+                new String[]{"ID", "Cliente", "Número", "Fecha", "Subtotal", "Impuesto", "Total"}, 0);
         vista.tbl_FFacturas.setModel(m);
         for (Factura f : em.createQuery("FROM Factura", Factura.class).getResultList()) {
-            m.addRow(new Object[]{f.getId(), f.getNumero(), f.getFecha(), f.getSubtotal(), f.getImpuesto(), f.getTotal(), f.getCliente() == null ? "" : f.getCliente().getNombre()});
+            m.addRow(new Object[]{f.getId(), f.getCliente() == null ? "" : f.getCliente().getNombre(),
+                    f.getNumero(), f.getFecha(), f.getSubtotal(), f.getImpuesto(), f.getTotal()});
         }
     }
 
@@ -53,7 +55,7 @@ public class FacturaControlador {
     }
 
     public void Factualizar() {
-        int fila = vista.tbl_FFacturas.getSelectedRow(); if (fila < 0) { JOptionPane.showMessageDialog(vista, "Selecciona una factura");
+        int filaVista = vista.tbl_FFacturas.getSelectedRow(); int fila = filaVista >= 0 ? vista.tbl_FFacturas.convertRowIndexToModel(filaVista) : -1; if (fila < 0) { JOptionPane.showMessageDialog(vista, "Selecciona una factura");
             return;
         } try { int id = ((Number) vista.tbl_FFacturas.getValueAt(fila, 0)).intValue();
             em.getTransaction().begin(); Factura f = em.find(Factura.class, id); leerFactura(f);
@@ -64,7 +66,7 @@ public class FacturaControlador {
                 }
     }
     public void Feliminar() {
-        int fila = vista.tbl_FFacturas.getSelectedRow(); if (fila < 0) {
+        int filaVista = vista.tbl_FFacturas.getSelectedRow(); int fila = filaVista >= 0 ? vista.tbl_FFacturas.convertRowIndexToModel(filaVista) : -1; if (fila < 0) {
             JOptionPane.showMessageDialog(vista, "Selecciona una factura"); return; }
         try {
             int id = ((Number) vista.tbl_FFacturas.getValueAt(fila, 0)).intValue();
