@@ -18,6 +18,10 @@ public class Factura {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private Cliente cliente;
+
     @Column(nullable = false, unique = true, length = 30)
     private String numero;
 
@@ -32,10 +36,6 @@ public class Factura {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cliente_id", nullable = false)
-    private Cliente cliente;
 
     @ManyToMany
     @JoinTable(

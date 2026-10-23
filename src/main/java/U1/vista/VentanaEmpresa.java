@@ -6,8 +6,14 @@ import U1.controlador.FacturaControlador;
 import U1.vista.base.VentanaEmpresaUI;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.util.regex.Pattern;
+import java.util.Comparator;
 
 // Ventana Swing (Vista) que delega la lógica de negocio y persistencia a ProductosControlador.
 public class VentanaEmpresa extends VentanaEmpresaUI {
@@ -15,6 +21,9 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
     private final ProductosControlador Pcontrolador;
     private final CategoriaControlador Ccontrolador;
     private final FacturaControlador Fcontrolador;
+
+    private TableRowSorter<DefaultTableModel> Psorter;
+    private TableRowSorter<DefaultTableModel> Fsorter;
 
     public VentanaEmpresa() {
         // Inicializa el controlador asociándolo a esta vista
@@ -39,9 +48,15 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
         cargarEstados();
         configurarEventos();
         Pcontrolador.Plistar();
+        Psorter = new TableRowSorter<>((DefaultTableModel) tbl_PProductos.getModel());
+        Psorter.setComparator(0, Comparator.comparingInt(valor -> Integer.parseInt(valor.toString())));
+        tbl_PProductos.setRowSorter(Psorter);
         Ccontrolador.Clistar();
         Fcontrolador.cargarCombos();
         Fcontrolador.Flistar();
+        Fsorter = new TableRowSorter<>((DefaultTableModel) tbl_FFacturas.getModel());
+        Fsorter.setComparator(0, Comparator.comparingInt(valor -> Integer.parseInt(valor.toString())));
+        tbl_FFacturas.setRowSorter(Fsorter);
         Empresa(tbl_PProductos, tbl_CCategorias);
     }
 
@@ -85,13 +100,47 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
         btn_FActualizar.addActionListener(e -> Fcontrolador.Factualizar());
         btn_FEliminar.addActionListener(e -> Fcontrolador.Feliminar());
         btn_FLimpiar.addActionListener(e -> Fcontrolador.Flimpiar());
+
+        //BUSCADORES
+        txt_PBuscador.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { DatosGenerales(); }
+            public void removeUpdate(DocumentEvent e) { DatosGenerales(); }
+            public void changedUpdate(DocumentEvent e) { DatosGenerales(); }
+        });
+
+        txt_FBuscador.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { DatosGenerales(); }
+            public void removeUpdate(DocumentEvent e) { DatosGenerales(); }
+            public void changedUpdate(DocumentEvent e) { DatosGenerales(); }
+        });
     }
 
+    private void DatosGenerales() {
+        if (Psorter == null)
+            return;
+        String PTexto = txt_PBuscador.getText().trim();
+        if (PTexto.isEmpty()) {
+            Psorter.setRowFilter(null);
+        } else {
+            Psorter.setRowFilter(RowFilter.regexFilter("(?i)" + Pattern.quote(PTexto)));
+        }
+
+        if (Fsorter == null)
+            return;
+        String FTexto = txt_FBuscador.getText().trim();
+        if (FTexto.isEmpty()) {
+            Fsorter.setRowFilter(null);
+        } else {
+            Fsorter.setRowFilter(RowFilter.regexFilter("(?i)" + Pattern.quote(FTexto)));
+        }
+
+    }
     public void Empresa(JTable tblPProductos, JTable tbl_CCategorias) {
         tblPProductos.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int fila = tbl_PProductos.getSelectedRow();
+                int filaVista = tbl_PProductos.getSelectedRow();
+                int fila = filaVista >= 0 ? tbl_PProductos.convertRowIndexToModel(filaVista) : -1;
                 if (fila != -1) {
                     txt_PNombre.setText(tbl_PProductos.getValueAt(fila, 1).toString());
                     txt_PPrecio.setText(tbl_PProductos.getValueAt(fila, 2).toString());
@@ -103,7 +152,8 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
         tbl_CCategorias.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int fila = tbl_CCategorias.getSelectedRow();
+                int filaVista = tbl_CCategorias.getSelectedRow();
+                int fila = filaVista >= 0 ? tbl_CCategorias.convertRowIndexToModel(filaVista) : -1;
                 if (fila != -1) {
                     boolean estado = Boolean.parseBoolean(tbl_CCategorias.getValueAt(fila, 3).toString());
                     cmb_CEstado.setSelectedIndex(estado ? 0 : 1);
