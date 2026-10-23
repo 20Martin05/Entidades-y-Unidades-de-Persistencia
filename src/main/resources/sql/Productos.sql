@@ -9,10 +9,9 @@ CREATE TABLE productos (
     -- Identificador autoincremental y clave primaria.
     id SERIAL PRIMARY KEY,
     -- Datos básicos del producto.
-    nombre VARCHAR,
-    precio NUMERIC(10,2),
-    cantidad INT,
-    categoria VARCHAR,
+    nombre VARCHAR(100) NOT NULL,
+    precio NUMERIC(10,2) NOT NULL,
+    cantidad INT NOT NULL,
     categoria_id INT,
     proveedor_id INT,
     CONSTRAINT fk_producto_categoria

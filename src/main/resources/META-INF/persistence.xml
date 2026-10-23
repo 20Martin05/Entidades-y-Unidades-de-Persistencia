@@ -7,11 +7,11 @@
     <persistence-unit name="postgres" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <!-- Entidad que Hibernate registra y mapea a la tabla productos. -->
-        <class>U1.entity.Productos</class>
-        <class>U1.entity.Categoria</class>
-        <class>U1.entity.Proveedor</class>
-        <class>U1.entity.Cliente</class>
-        <class>U1.entity.Factura</class>
+        <class>U1.modelo.Productos</class>
+        <class>U1.modelo.Categoria</class>
+        <class>U1.modelo.Proveedor</class>
+        <class>U1.modelo.Cliente</class>
+        <class>U1.modelo.Factura</class>
 
         <properties>
             <!-- Datos de conexión a PostgreSQL -->
