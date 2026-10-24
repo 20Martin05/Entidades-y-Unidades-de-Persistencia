@@ -48,6 +48,7 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
         cargarEstados();
         configurarEventos();
         Pcontrolador.Plistar();
+        Pcontrolador.PbuscarPorNombre(txt_PBuscador.getText());
         Psorter = new TableRowSorter<>((DefaultTableModel) tbl_PProductos.getModel());
         Psorter.setComparator(0, Comparator.comparingInt(valor -> Integer.parseInt(valor.toString())));
         tbl_PProductos.setRowSorter(Psorter);
@@ -103,37 +104,36 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
 
         //BUSCADORES
         txt_PBuscador.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { DatosGenerales(); }
-            public void removeUpdate(DocumentEvent e) { DatosGenerales(); }
-            public void changedUpdate(DocumentEvent e) { DatosGenerales(); }
+            public void insertUpdate(DocumentEvent e) { filtrarProductos(); }
+            public void removeUpdate(DocumentEvent e) { filtrarProductos(); }
+            public void changedUpdate(DocumentEvent e) { filtrarProductos(); }
         });
 
         txt_FBuscador.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { DatosGenerales(); }
-            public void removeUpdate(DocumentEvent e) { DatosGenerales(); }
-            public void changedUpdate(DocumentEvent e) { DatosGenerales(); }
+            public void insertUpdate(DocumentEvent e) { filtrarFacturas(); }
+            public void removeUpdate(DocumentEvent e) { filtrarFacturas(); }
+            public void changedUpdate(DocumentEvent e) { filtrarFacturas(); }
         });
     }
 
-    private void DatosGenerales() {
-        if (Psorter == null)
-            return;
+    private void filtrarProductos() {
         String PTexto = txt_PBuscador.getText().trim();
+
         if (PTexto.isEmpty()) {
-            Psorter.setRowFilter(null);
-        } else {
-            Psorter.setRowFilter(RowFilter.regexFilter("(?i)" + Pattern.quote(PTexto)));
+            Pcontrolador.Plistar();
+            return;
         }
 
-        if (Fsorter == null)
-            return;
+        Pcontrolador.PbuscarYMostrar(PTexto);
+
+    }
+    private void filtrarFacturas() {
         String FTexto = txt_FBuscador.getText().trim();
         if (FTexto.isEmpty()) {
-            Fsorter.setRowFilter(null);
-        } else {
-            Fsorter.setRowFilter(RowFilter.regexFilter("(?i)" + Pattern.quote(FTexto)));
+            Fcontrolador.Flistar();
+            return;
         }
-
+        Fcontrolador.FbuscarYMostrar(FTexto);
     }
     public void Empresa(JTable tblPProductos, JTable tbl_CCategorias) {
         tblPProductos.addMouseListener(new MouseAdapter() {

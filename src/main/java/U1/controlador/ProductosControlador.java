@@ -25,6 +25,7 @@ public class ProductosControlador {
     public void Plistar() {
         DefaultTableModel modelo = new DefaultTableModel(
                 new String[]{"ID", "Nombre", "Precio", "Cantidad", "categoria_id"}, 0);
+        vista.tbl_PProductos.setRowSorter(null);
         vista.tbl_PProductos.setModel(modelo);
         List<Productos> lista = em.createQuery("FROM Productos", Productos.class).getResultList();
         for (Productos p : lista) {
@@ -132,5 +133,45 @@ public class ProductosControlador {
         vista.txt_PNombre.setText("");
         vista.txt_PPrecio.setText("");
         vista.txt_PCantidad.setText("");
+    }
+
+    public List<Productos> PbuscarPorNombre(String nombre) {
+        return em.createQuery(
+                        "SELECT p FROM Productos p WHERE LOWER(p.nombre) LIKE LOWER(:nombre) ORDER BY p.nombre",
+                        Productos.class)
+                .setParameter("nombre", "%" + nombre + "%")
+                .getResultList();
+    }
+
+    public List<Productos> PlistarConStock(int cantidad) {
+        return em.createQuery(
+                        "SELECT p FROM Productos p WHERE p.cantidad > :cantidad ORDER BY p.cantidad DESC",
+                        Productos.class)
+                .setParameter("cantidad", cantidad)
+                .getResultList();
+    }
+
+    public void PbuscarYMostrar(String texto) {
+        DefaultTableModel modelo = new DefaultTableModel(
+                new String[]{"ID", "Nombre", "Precio", "Cantidad", "categoria_id"}, 0
+        );
+
+        List<Productos> lista = PbuscarPorNombre(texto);
+
+        for (Productos p : lista) {
+            Integer categoriaId = p.getCategoriaRelacion() == null
+                    ? null
+                    : p.getCategoriaRelacion().getId();
+
+            modelo.addRow(new Object[]{
+                    p.getId(),
+                    p.getNombre(),
+                    p.getPrecio(),
+                    p.getCantidad(),
+                    categoriaId
+            });
+        }
+
+        vista.tbl_PProductos.setModel(modelo);
     }
 }

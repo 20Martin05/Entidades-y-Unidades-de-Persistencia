@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public class FacturaControlador {
     private final VentanaEmpresa vista;
@@ -87,6 +88,25 @@ public class FacturaControlador {
         vista.txt_FSubTotal.setText("");
         vista.txt_FImpuesto.setText("");
         vista.txt_FTotal.setText("");
+    }
+
+    public List<Factura> FbuscarPorCliente(String cliente) {
+        return em.createQuery(
+                        "SELECT f FROM Factura f JOIN f.cliente c WHERE LOWER(c.nombre) LIKE LOWER(:cliente) ORDER BY f.id",
+                        Factura.class)
+                .setParameter("cliente", "%" + cliente + "%")
+                .getResultList();
+    }
+
+    public void FbuscarYMostrar(String texto) {
+        DefaultTableModel modelo = new DefaultTableModel(
+                new String[]{"ID", "Cliente", "Número", "Fecha", "Subtotal", "Impuesto", "Total"}, 0);
+        for (Factura f : FbuscarPorCliente(texto)) {
+            modelo.addRow(new Object[]{f.getId(), f.getCliente() == null ? "" : f.getCliente().getNombre(),
+                    f.getNumero(), f.getFecha(), f.getSubtotal(), f.getImpuesto(), f.getTotal()});
+        }
+        vista.tbl_FFacturas.setRowSorter(null);
+        vista.tbl_FFacturas.setModel(modelo);
     }
 
     private Factura leerFactura(Factura f) {
