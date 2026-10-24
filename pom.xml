@@ -59,7 +59,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.48</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <!-- IntelliJ GUI Forms Runtime (permite ejecutar la interfaz gráfica en Eclipse, NetBeans, VS Code, etc.) -->

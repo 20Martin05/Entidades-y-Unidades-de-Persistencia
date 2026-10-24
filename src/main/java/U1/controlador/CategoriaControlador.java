@@ -4,8 +4,6 @@ import U1.modelo.Categoria;
 import U1.vista.VentanaEmpresa;
 import U1.util.ConexionJPA;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,7 +21,7 @@ public class CategoriaControlador {
         DefaultTableModel modelo = new DefaultTableModel(
                 new String[]{"ID", "Nombre", "Descripción", "Estado"}, 0);
         vista.tbl_CCategorias.setModel(modelo);
-        List<Categoria> lista = em.createQuery("FROM Categoria ", Categoria.class).getResultList();
+        List<Categoria> lista = em.createQuery("SELECT c FROM Categoria c ORDER BY c.id", Categoria.class).getResultList();
         for (Categoria c : lista) {
             modelo.addRow(new Object[]{c.getId(), c.getNombre(), c.getDescripcion(), c.isEstado()});
         }

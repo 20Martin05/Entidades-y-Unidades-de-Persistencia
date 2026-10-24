@@ -5,8 +5,6 @@ import U1.modelo.Categoria;
 import U1.vista.VentanaEmpresa;
 import U1.util.ConexionJPA;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

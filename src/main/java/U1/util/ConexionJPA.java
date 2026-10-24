@@ -13,4 +13,10 @@ public final class ConexionJPA {
     public static EntityManager crearEntityManager() {
         return FACTORY.createEntityManager();
     }
+
+    public static void cerrar() {
+        if (FACTORY.isOpen()) {
+            FACTORY.close();
+        }
+    }
 }

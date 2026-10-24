@@ -25,9 +25,9 @@
             <!-- Actualiza la estructura de la tabla sin eliminar los datos existentes. -->
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <!-- Muestra las consultas SQL en la salida de la aplicación. -->
-            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.show_sql" value="false"/>
             <!-- Da formato legible a las consultas SQL mostradas. -->
-            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.format_sql" value="false"/>
         </properties>
     </persistence-unit>
 
