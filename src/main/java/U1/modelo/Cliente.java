@@ -3,6 +3,7 @@ package U1.modelo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
 @Table(name = "clientes")
 @Getter
 @Setter
+@ToString(exclude = "facturas")
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +33,7 @@ public class Cliente {
     @Column(length = 100)
     private String correo;
 
-    @OneToMany(mappedBy = "cliente")
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Factura> facturas = new HashSet<>();
 
     public Cliente() {
