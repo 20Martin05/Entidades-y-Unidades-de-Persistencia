@@ -3,6 +3,7 @@ package U1.modelo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Table(name = "facturas")
 @Getter
 @Setter
+@ToString(exclude = {"cliente", "productos"})
 public class Factura {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +39,7 @@ public class Factura {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "factura_productos",
             joinColumns = @JoinColumn(name = "factura_id"),

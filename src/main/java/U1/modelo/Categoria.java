@@ -3,6 +3,7 @@ package U1.modelo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
 @Table(name = "categorias")
 @Getter
 @Setter
+@ToString(exclude = {"productos", "proveedores"})
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +27,7 @@ public class Categoria {
     @Column(nullable = false)
     private boolean estado = true;
 
-    @OneToMany(mappedBy = "categoriaRelacion")
+    @OneToMany(mappedBy = "categoriaRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Productos> productos = new HashSet<>();
 
     @ManyToMany
@@ -37,7 +39,6 @@ public class Categoria {
     private Set<Proveedor> proveedores = new HashSet<>();
 
     public Categoria() {
-
     }
 
     public Categoria(int id, String nombre, String descripcion, boolean estado) {
@@ -45,15 +46,5 @@ public class Categoria {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.estado = estado;
-    }
-
-    @Override
-    public String toString() {
-        return "Categoria{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", estado=" + estado +
-                '}';
     }
 }

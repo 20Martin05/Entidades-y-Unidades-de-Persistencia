@@ -3,6 +3,7 @@ package U1.modelo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.Set;
 @Table(name = "productos")
 @Getter
 @Setter
+@ToString(exclude = {"categoriaRelacion", "proveedor", "facturas"})
 public class Productos {
 
     @Id
@@ -46,15 +48,5 @@ public class Productos {
         this.nombre = nombre;
         this.precio = precio;
         this.cantidad = cantidad;
-    }
-
-    @Override
-    public String toString() {
-        return "Productos{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", precio=" + precio +
-                ", cantidad=" + cantidad +
-                '}';
     }
 }

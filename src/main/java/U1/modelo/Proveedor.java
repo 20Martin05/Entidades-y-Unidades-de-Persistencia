@@ -3,6 +3,7 @@ package U1.modelo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Set;
 @Table(name = "proveedores")
 @Getter
 @Setter
+@ToString(exclude = {"productos", "categorias"})
 public class Proveedor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +33,7 @@ public class Proveedor {
     @Column(length = 255)
     private String direccion;
 
-    @OneToMany(mappedBy = "proveedor")
+    @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Productos> productos = new HashSet<>();
 
     @ManyToMany(mappedBy = "proveedores")
