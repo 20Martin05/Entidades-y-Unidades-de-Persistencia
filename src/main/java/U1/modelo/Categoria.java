@@ -30,14 +30,6 @@ public class Categoria {
     @OneToMany(mappedBy = "categoriaRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Productos> productos = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "categoria_proveedor",
-            joinColumns = @JoinColumn(name = "categoria_id"),
-            inverseJoinColumns = @JoinColumn(name = "proveedor_id")
-    )
-    private Set<Proveedor> proveedores = new HashSet<>();
-
     public Categoria() {
     }
 

@@ -6,14 +6,14 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "productos")
 @Getter
 @Setter
-@ToString(exclude = {"categoriaRelacion", "proveedor", "facturas"})
+@ToString(exclude = {"categoriaRelacion", "proveedor", "detalles"})
 public class Productos {
 
     @Id
@@ -33,12 +33,8 @@ public class Productos {
     @JoinColumn(name = "categoria_id")
     private Categoria categoriaRelacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proveedor_id")
-    private Proveedor proveedor;
-
-    @ManyToMany(mappedBy = "productos")
-    private Set<Factura> facturas = new HashSet<>();
+    @OneToMany(mappedBy = "producto")
+    private List<FacturaDetalle> detalles = new ArrayList<>();
 
     public Productos() {
     }

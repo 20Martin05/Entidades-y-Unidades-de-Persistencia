@@ -17,30 +17,24 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
     private final ProductosControlador Pcontrolador;
     private final CategoriaControlador Ccontrolador;
     private final FacturaControlador Fcontrolador;
-    private final ProveedorControlador PRcontrolador;
     private final ClientesControlador CLcontrolador;
 
     private TableRowSorter<DefaultTableModel> Psorter;
     private TableRowSorter<DefaultTableModel> Fsorter;
-    private TableRowSorter<DefaultTableModel> PRsorter;
     private TableRowSorter<DefaultTableModel> CLsorter;
 
     public VentanaEmpresa() {
-        // Inicializa los controladores asociándolos a esta vista
         this.Pcontrolador = new ProductosControlador(this);
         this.Ccontrolador = new CategoriaControlador(this);
         this.Fcontrolador = new FacturaControlador(this);
-        this.PRcontrolador = new ProveedorControlador(this);
         this.CLcontrolador = new ClientesControlador(this);
 
-        // Configuración visual básica de la ventana
         setTitle("Gestión de Productos - Corporación Favorita");
         setContentPane(PanelPrincipal);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
         setLocationRelativeTo(null);
 
-        // Método general que orquesta todas las inicializaciones
         iniciar();
     }
 
@@ -65,22 +59,24 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
         Fsorter.setComparator(0, Comparator.comparingInt(valor -> Integer.parseInt(valor.toString())));
         tbl_FFacturas.setRowSorter(Fsorter);
 
-        // Proveedores (Incluye listado y carga de su JComboBox)
-        PRcontrolador.PRlistar();
-        PRcontrolador.cargarComboCategorias();
-        PRsorter = new TableRowSorter<>((DefaultTableModel) tbl_PRProveedores.getModel());
-        PRsorter.setComparator(0, Comparator.comparingInt(valor -> Integer.parseInt(valor.toString())));
-        tbl_PRProveedores.setRowSorter(PRsorter);
-
-        // Clientes (Incluye listado y carga de su JComboBox)
+        // Clientes
         CLcontrolador.CLlistar();
         CLcontrolador.cargarComboFacturas();
         CLsorter = new TableRowSorter<>((DefaultTableModel) tbl_CLClientes.getModel());
         CLsorter.setComparator(0, Comparator.comparingInt(valor -> Integer.parseInt(valor.toString())));
         tbl_CLClientes.setRowSorter(CLsorter);
 
-        // Listeners de selección de filas en tablas
         configurarEventosTablas();
+    }
+
+    private void recargarTodo() {
+        Fcontrolador.cargarCombos();
+        CLcontrolador.cargarComboFacturas();
+
+        Pcontrolador.Plistar();
+        Ccontrolador.Clistar();
+        Fcontrolador.Flistar();
+        CLcontrolador.CLlistar();
     }
 
     private void cargarCategorias() {
@@ -109,33 +105,27 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
 
     private void configurarEventos() {
         // PRODUCTOS
-        btn_PGuardar.addActionListener(e -> Pcontrolador.Pguardar());
-        btn_PActualizar.addActionListener(e -> Pcontrolador.Pactualizar());
-        btn_PEliminar.addActionListener(e -> Pcontrolador.Peliminar());
+        btn_PGuardar.addActionListener(e -> { Pcontrolador.Pguardar(); recargarTodo(); });
+        btn_PActualizar.addActionListener(e -> { Pcontrolador.Pactualizar(); recargarTodo(); });
+        btn_PEliminar.addActionListener(e -> { Pcontrolador.Peliminar(); recargarTodo(); });
         btn_PLimpiar.addActionListener(e -> Pcontrolador.Plimpiar());
 
         // CATEGORIA
-        btn_CGuardar.addActionListener(e -> Ccontrolador.Cguardar());
-        btn_CActualizar.addActionListener(e -> Ccontrolador.Cactualizar());
-        btn_CEliminar.addActionListener(e -> Ccontrolador.Celiminar());
+        btn_CGuardar.addActionListener(e -> { Ccontrolador.Cguardar(); recargarTodo(); });
+        btn_CActualizar.addActionListener(e -> { Ccontrolador.Cactualizar(); recargarTodo(); });
+        btn_CEliminar.addActionListener(e -> { Ccontrolador.Celiminar(); recargarTodo(); });
         btn_CLimpiar.addActionListener(e -> Ccontrolador.Climpiar());
 
         // FACTURA
-        btn_FGuardar.addActionListener(e -> Fcontrolador.Fguardar());
-        btn_FActualizar.addActionListener(e -> Fcontrolador.Factualizar());
-        btn_FEliminar.addActionListener(e -> Fcontrolador.Feliminar());
+        btn_FGuardar.addActionListener(e -> { Fcontrolador.Fguardar(); recargarTodo(); });
+        btn_FActualizar.addActionListener(e -> { Fcontrolador.Factualizar(); recargarTodo(); });
+        btn_FEliminar.addActionListener(e -> { Fcontrolador.Feliminar(); recargarTodo(); });
         btn_FLimpiar.addActionListener(e -> Fcontrolador.Flimpiar());
 
-        // PROVEEDOR
-        btn_PRGuardar.addActionListener(e -> PRcontrolador.PRguardar());
-        btn_PRActualizar.addActionListener(e -> PRcontrolador.PRactualizar());
-        btn_PREliminar.addActionListener(e -> PRcontrolador.PReliminar());
-        btn_PRLimpiar.addActionListener(e -> PRcontrolador.PRlimpiar());
-
         // CLIENTE
-        btn_CLGuardar.addActionListener(e -> CLcontrolador.CLguardar());
-        btn_CLActualizar.addActionListener(e -> CLcontrolador.CLactualizar());
-        btn_CLEliminar.addActionListener(e -> CLcontrolador.CLeliminar());
+        btn_CLGuardar.addActionListener(e -> { CLcontrolador.CLguardar(); recargarTodo(); });
+        btn_CLActualizar.addActionListener(e -> { CLcontrolador.CLactualizar(); recargarTodo(); });
+        btn_CLEliminar.addActionListener(e -> { CLcontrolador.CLeliminar(); recargarTodo(); });
         btn_CLLimpiar.addActionListener(e -> CLcontrolador.CLlimpiar());
 
         // BUSCADORES
@@ -149,12 +139,6 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
             public void insertUpdate(DocumentEvent e) { filtrarFacturas(); }
             public void removeUpdate(DocumentEvent e) { filtrarFacturas(); }
             public void changedUpdate(DocumentEvent e) { filtrarFacturas(); }
-        });
-
-        txt_PRBuscador.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { filtrarProveedores(); }
-            public void removeUpdate(DocumentEvent e) { filtrarProveedores(); }
-            public void changedUpdate(DocumentEvent e) { filtrarProveedores(); }
         });
 
         txt_CLBuscador.getDocument().addDocumentListener(new DocumentListener() {
@@ -180,15 +164,6 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
             return;
         }
         Fcontrolador.FbuscarYMostrar(texto);
-    }
-
-    private void filtrarProveedores() {
-        String texto = txt_PRBuscador.getText().trim();
-        if (texto.isEmpty()) {
-            PRcontrolador.PRlistar();
-            return;
-        }
-        PRcontrolador.PRbuscarYMostrar(texto);
     }
 
     private void filtrarClientes() {
@@ -228,21 +203,6 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
             }
         });
 
-        tbl_PRProveedores.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int filaVista = tbl_PRProveedores.getSelectedRow();
-                int fila = filaVista >= 0 ? tbl_PRProveedores.convertRowIndexToModel(filaVista) : -1;
-                if (fila != -1) {
-                    txt_PRNombre.setText(tbl_PRProveedores.getValueAt(fila, 1) != null ? tbl_PRProveedores.getValueAt(fila, 1).toString() : "");
-                    txt_PREmpresa.setText(tbl_PRProveedores.getValueAt(fila, 2) != null ? tbl_PRProveedores.getValueAt(fila, 2).toString() : "");
-                    txt_PRTelefono.setText(tbl_PRProveedores.getValueAt(fila, 3) != null ? tbl_PRProveedores.getValueAt(fila, 3).toString() : "");
-                    txt_PRCorreo.setText(tbl_PRProveedores.getValueAt(fila, 4) != null ? tbl_PRProveedores.getValueAt(fila, 4).toString() : "");
-                    txt_PRDireccion.setText(tbl_PRProveedores.getValueAt(fila, 5) != null ? tbl_PRProveedores.getValueAt(fila, 5).toString() : "");
-                }
-            }
-        });
-
         tbl_CLClientes.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -255,6 +215,13 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
                     txt_CLTelefono.setText(tbl_CLClientes.getValueAt(fila, 4) != null ? tbl_CLClientes.getValueAt(fila, 4).toString() : "");
                     txt_CLCorreo.setText(tbl_CLClientes.getValueAt(fila, 5) != null ? tbl_CLClientes.getValueAt(fila, 5).toString() : "");
                 }
+            }
+        });
+
+        tbl_FFacturas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Fcontrolador.Fcargar();
             }
         });
     }

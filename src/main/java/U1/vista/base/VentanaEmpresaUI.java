@@ -17,7 +17,6 @@ public class VentanaEmpresaUI extends JFrame {
     public JButton btn_PLimpiar;
 
     //Componentes de CATEGORIA
-    public JTextField txt_CNombre;
     public JTextField txt_CDescripcion;
     public JTable tbl_CCategorias;
     public JButton btn_CGuardar;
@@ -33,6 +32,7 @@ public class VentanaEmpresaUI extends JFrame {
     public JComboBox cmb_FCliente;
     public JTextField txt_FNumero;
     public JTextField txt_FFecha;
+    public JTextField txt_FCantidad;
     public JTextField txt_FSubTotal;
     public JTextField txt_FImpuesto;
     public JTextField txt_FTotal;

@@ -19,6 +19,17 @@ public class ProductosControlador {
         this.vista = vista;
     }
 
+    private String capitalizar(String texto) {
+        if (texto == null || texto.isBlank()) return "";
+        String[] palabras = texto.trim().toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String p : palabras) {
+            if (sb.length() > 0) sb.append(' ');
+            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1));
+        }
+        return sb.toString();
+    }
+
     public void Plistar() {
         DefaultTableModel modelo = new DefaultTableModel(
                 new String[]{"ID", "Nombre", "Precio", "Cantidad", "categoria_id"}, 0);
@@ -42,7 +53,7 @@ public class ProductosControlador {
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            String nombre = vista.txt_PNombre.getText().trim();
+            String nombre = capitalizar(vista.txt_PNombre.getText());
             BigDecimal precio = new BigDecimal(vista.txt_PPrecio.getText().trim());
             int cantidad = Integer.parseInt(vista.txt_PCantidad.getText().trim());
 
@@ -78,7 +89,7 @@ public class ProductosControlador {
         EntityTransaction tx = em.getTransaction();
         try {
             int id = ((Number) vista.tbl_PProductos.getValueAt(fila, 0)).intValue();
-            String nuevoNombre = vista.txt_PNombre.getText().trim();
+            String nuevoNombre = capitalizar(vista.txt_PNombre.getText());
             BigDecimal nuevoPrecio = new BigDecimal(vista.txt_PPrecio.getText().trim());
             int nuevaCantidad = Integer.parseInt(vista.txt_PCantidad.getText().trim());
 
@@ -164,25 +175,15 @@ public class ProductosControlador {
 
     public void PbuscarYMostrar(String texto) {
         DefaultTableModel modelo = new DefaultTableModel(
-                new String[]{"ID", "Nombre", "Precio", "Cantidad", "categoria_id"}, 0
-        );
-
-        List<Productos> lista = PbuscarPorNombre(texto);
-
-        for (Productos p : lista) {
+                new String[]{"ID", "Nombre", "Precio", "Cantidad", "categoria_id"}, 0);
+        for (Productos p : PbuscarPorNombre(texto)) {
             Integer categoriaId = p.getCategoriaRelacion() == null
                     ? null
                     : p.getCategoriaRelacion().getId();
-
             modelo.addRow(new Object[]{
-                    p.getId(),
-                    p.getNombre(),
-                    p.getPrecio(),
-                    p.getCantidad(),
-                    categoriaId
+                    p.getId(), p.getNombre(), p.getPrecio(), p.getCantidad(), categoriaId
             });
         }
-
         vista.tbl_PProductos.setModel(modelo);
     }
 }

@@ -2,7 +2,7 @@
 -- TABLA: PRODUCTOS
 -- ==========================================
 -- Elimina la tabla anterior para permitir recrear el esquema desde cero.
-DROP TABLE IF EXISTS productos;
+DROP TABLE IF EXISTS productos CASCADE ;
 
 -- Define la estructura utilizada por la entidad JPA Productos.
 CREATE TABLE productos (
