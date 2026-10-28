@@ -18,6 +18,17 @@ public class ClientesControlador {
         this.vista = vista;
     }
 
+    private String capitalizar(String texto) {
+        if (texto == null || texto.isBlank()) return "";
+        String[] palabras = texto.trim().toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String p : palabras) {
+            if (sb.length() > 0) sb.append(' ');
+            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1));
+        }
+        return sb.toString();
+    }
+
     public void CLlistar() {
         DefaultTableModel modelo = new DefaultTableModel(
                 new String[]{"ID", "Nombre", "Apellido", "Cédula", "Teléfono", "Correo"}, 0);
@@ -43,11 +54,11 @@ public class ClientesControlador {
 
     public void CLguardar() {
         try {
-            String nombre = vista.txt_CLNombre.getText().trim();
-            String apellido = vista.txt_CLApellido.getText().trim();
+            String nombre = capitalizar(vista.txt_CLNombre.getText());
+            String apellido = capitalizar(vista.txt_CLApellido.getText());
             String cedula = vista.txt_CLCedula.getText().trim();
             String telefono = vista.txt_CLTelefono.getText().trim();
-            String correo = vista.txt_CLCorreo.getText().trim();
+            String correo = vista.txt_CLCorreo.getText().trim().toLowerCase();
 
             Cliente nuevo = new Cliente();
             nuevo.setNombre(nombre);
@@ -78,11 +89,11 @@ public class ClientesControlador {
         }
         try {
             int id = ((Number) vista.tbl_CLClientes.getValueAt(fila, 0)).intValue();
-            String nuevoNombre = vista.txt_CLNombre.getText().trim();
-            String nuevoApellido = vista.txt_CLApellido.getText().trim();
+            String nuevoNombre = capitalizar(vista.txt_CLNombre.getText());
+            String nuevoApellido = capitalizar(vista.txt_CLApellido.getText());
             String nuevaCedula = vista.txt_CLCedula.getText().trim();
             String nuevoTelefono = vista.txt_CLTelefono.getText().trim();
-            String nuevoCorreo = vista.txt_CLCorreo.getText().trim();
+            String nuevoCorreo = vista.txt_CLCorreo.getText().trim().toLowerCase();
 
             em.getTransaction().begin();
             Cliente cliente = em.find(Cliente.class, id);

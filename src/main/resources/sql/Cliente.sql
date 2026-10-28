@@ -2,7 +2,7 @@
 -- TABLA: CLIENTES
 -- ==========================================
 -- Elimina la tabla anterior para permitir recrear el esquema desde cero.
-DROP TABLE IF EXISTS clientes;
+DROP TABLE IF EXISTS clientes CASCADE ;
 
 -- Define la estructura utilizada por la entidad JPA Cliente.
 CREATE TABLE clientes (
