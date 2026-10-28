@@ -7,15 +7,16 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "facturas")
 @Getter
 @Setter
-@ToString(exclude = {"cliente", "productos"})
+@ToString(exclude = {"cliente", "detalles"})
 public class Factura {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -39,13 +40,8 @@ public class Factura {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "factura_productos",
-            joinColumns = @JoinColumn(name = "factura_id"),
-            inverseJoinColumns = @JoinColumn(name = "producto_id")
-    )
-    private Set<Productos> productos = new HashSet<>();
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FacturaDetalle> detalles = new ArrayList<>();
 
     public Factura() {
     }

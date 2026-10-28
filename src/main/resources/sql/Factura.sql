@@ -2,7 +2,7 @@
 -- TABLA: FACTURAS
 -- ==========================================
 -- Elimina la tabla anterior para permitir recrear el esquema desde cero.
-DROP TABLE IF EXISTS facturas;
+DROP TABLE IF EXISTS facturas CASCADE ;
 
 -- Define la estructura utilizada por la entidad JPA Factura.
 CREATE TABLE facturas (
