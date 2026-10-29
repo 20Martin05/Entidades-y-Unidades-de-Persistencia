@@ -9,9 +9,9 @@
         <!-- Entidad que Hibernate registra y mapea a la tabla productos. -->
         <class>U1.modelo.Productos</class>
         <class>U1.modelo.Categoria</class>
-        <class>U1.modelo.Proveedor</class>
         <class>U1.modelo.Cliente</class>
         <class>U1.modelo.Factura</class>
+        <class>U1.modelo.FacturaDetalle</class>
 
         <properties>
             <!-- Datos de conexión a PostgreSQL -->
@@ -23,7 +23,7 @@
 
             <!-- Propiedades de Hibernate -->
             <!-- Actualiza la estructura de la tabla sin eliminar los datos existentes. -->
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
             <!-- Muestra las consultas SQL en la salida de la aplicación. -->
             <property name="hibernate.show_sql" value="false"/>
             <!-- Da formato legible a las consultas SQL mostradas. -->

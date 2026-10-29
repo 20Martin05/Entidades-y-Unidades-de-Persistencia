@@ -1,8 +1,8 @@
 -- ==========================================
--- TABLA: CATEGORIAS
+-- TABLA: CATEGORÍAS
 -- ==========================================
 -- Elimina la tabla anterior para permitir recrear el esquema desde cero.
-DROP TABLE IF EXISTS categorias CASCADE ;
+DROP TABLE IF EXISTS categorias CASCADE;
 
 -- Define la estructura utilizada por la entidad JPA Categoria.
 CREATE TABLE categorias (
