@@ -33,7 +33,7 @@ public class Cliente {
     @Column(length = 100)
     private String correo;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cliente")
     private Set<Factura> facturas = new HashSet<>();
 
     public Cliente() {

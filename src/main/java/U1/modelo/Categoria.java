@@ -12,7 +12,7 @@ import java.util.Set;
 @Table(name = "categorias")
 @Getter
 @Setter
-@ToString(exclude = {"productos", "proveedores"})
+@ToString(exclude = {"productos"})
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class Categoria {
     @Column(nullable = false)
     private boolean estado = true;
 
-    @OneToMany(mappedBy = "categoriaRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "categoriaRelacion")
     private Set<Productos> productos = new HashSet<>();
 
     public Categoria() {

@@ -12,7 +12,6 @@ import java.util.List;
 
 public class ClientesControlador {
     private final VentanaEmpresa vista;
-    private final EntityManager em = ConexionJPA.crearEntityManager();
 
     public ClientesControlador(VentanaEmpresa vista) {
         this.vista = vista;
@@ -29,12 +28,12 @@ public class ClientesControlador {
         return sb.toString();
     }
 
-    public void CLlistar() {
-        DefaultTableModel modelo = new DefaultTableModel(
+    private DefaultTableModel crearModelo() {
+        return new DefaultTableModel(
                 new String[]{"ID", "Nombre", "Apellido", "Cédula", "Teléfono", "Correo"}, 0);
-        vista.tbl_CLClientes.setRowSorter(null);
-        vista.tbl_CLClientes.setModel(modelo);
-        List<Cliente> lista = em.createQuery("FROM Cliente", Cliente.class).getResultList();
+    }
+
+    private void llenar(DefaultTableModel modelo, List<Cliente> lista) {
         for (Cliente c : lista) {
             modelo.addRow(new Object[]{
                     c.getId(), c.getNombre(), c.getApellido(), c.getCedula(), c.getTelefono(), c.getCorreo()
@@ -42,24 +41,32 @@ public class ClientesControlador {
         }
     }
 
+    public void CLlistar() {
+        DefaultTableModel modelo = crearModelo();
+        try (EntityManager em = ConexionJPA.crearEntityManager()) {
+            llenar(modelo, em.createQuery("FROM Cliente", Cliente.class).getResultList());
+        }
+        vista.tbl_CLClientes.setModel(modelo);
+    }
+
     public void cargarComboFacturas() {
-        if (vista.cmb_PRFactura != null) {
-            vista.cmb_PRFactura.removeAllItems();
-            List<Factura> lista = em.createQuery("FROM Factura", Factura.class).getResultList();
-            for (Factura f : lista) {
+        if (vista.cmb_PRFactura == null) return;
+        vista.cmb_PRFactura.removeAllItems();
+        try (EntityManager em = ConexionJPA.crearEntityManager()) {
+            for (Factura f : em.createQuery("FROM Factura", Factura.class).getResultList()) {
                 vista.cmb_PRFactura.addItem(f.getNumero());
             }
         }
     }
 
     public void CLguardar() {
-        try {
-            String nombre = capitalizar(vista.txt_CLNombre.getText());
-            String apellido = capitalizar(vista.txt_CLApellido.getText());
-            String cedula = vista.txt_CLCedula.getText().trim();
-            String telefono = vista.txt_CLTelefono.getText().trim();
-            String correo = vista.txt_CLCorreo.getText().trim().toLowerCase();
+        String nombre = capitalizar(vista.txt_CLNombre.getText());
+        String apellido = capitalizar(vista.txt_CLApellido.getText());
+        String cedula = vista.txt_CLCedula.getText().trim();
+        String telefono = vista.txt_CLTelefono.getText().trim();
+        String correo = vista.txt_CLCorreo.getText().trim().toLowerCase();
 
+        try (EntityManager em = ConexionJPA.crearEntityManager()) {
             Cliente nuevo = new Cliente();
             nuevo.setNombre(nombre);
             nuevo.setApellido(apellido);
@@ -70,31 +77,25 @@ public class ClientesControlador {
             em.getTransaction().begin();
             em.persist(nuevo);
             em.getTransaction().commit();
-
             JOptionPane.showMessageDialog(vista, "Cliente guardado con éxito");
-            CLlistar();
-            cargarComboFacturas(); // Actualiza el combo por si se creó relación
         } catch (RuntimeException ex) {
-            CLcancelarTransaccionSiNecesario();
             JOptionPane.showMessageDialog(vista, "No se pudo guardar el cliente: " + ex.getMessage());
         }
+        CLlistar();
+        cargarComboFacturas();
     }
 
     public void CLactualizar() {
-        int filaVista = vista.tbl_CLClientes.getSelectedRow();
-        int fila = filaVista >= 0 ? vista.tbl_CLClientes.convertRowIndexToModel(filaVista) : -1;
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona un cliente de la tabla primero");
-            return;
-        }
-        try {
-            int id = ((Number) vista.tbl_CLClientes.getValueAt(fila, 0)).intValue();
-            String nuevoNombre = capitalizar(vista.txt_CLNombre.getText());
-            String nuevoApellido = capitalizar(vista.txt_CLApellido.getText());
-            String nuevaCedula = vista.txt_CLCedula.getText().trim();
-            String nuevoTelefono = vista.txt_CLTelefono.getText().trim();
-            String nuevoCorreo = vista.txt_CLCorreo.getText().trim().toLowerCase();
+        int id = idSeleccionado();
+        if (id == -1) return;
 
+        String nuevoNombre = capitalizar(vista.txt_CLNombre.getText());
+        String nuevoApellido = capitalizar(vista.txt_CLApellido.getText());
+        String nuevaCedula = vista.txt_CLCedula.getText().trim();
+        String nuevoTelefono = vista.txt_CLTelefono.getText().trim();
+        String nuevoCorreo = vista.txt_CLCorreo.getText().trim().toLowerCase();
+
+        try (EntityManager em = ConexionJPA.crearEntityManager()) {
             em.getTransaction().begin();
             Cliente cliente = em.find(Cliente.class, id);
             if (cliente != null) {
@@ -106,40 +107,41 @@ public class ClientesControlador {
             }
             em.getTransaction().commit();
             JOptionPane.showMessageDialog(vista, "Cliente actualizado con éxito");
-            CLlistar();
         } catch (RuntimeException ex) {
-            CLcancelarTransaccionSiNecesario();
             JOptionPane.showMessageDialog(vista, "No se pudo actualizar el cliente: " + ex.getMessage());
         }
+        CLlistar();
     }
 
     public void CLeliminar() {
-        int filaVista = vista.tbl_CLClientes.getSelectedRow();
-        int fila = filaVista >= 0 ? vista.tbl_CLClientes.convertRowIndexToModel(filaVista) : -1;
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona un cliente de la tabla primero");
-            return;
-        }
-
-        int id = ((Number) vista.tbl_CLClientes.getValueAt(fila, 0)).intValue();
+        int id = idSeleccionado();
+        if (id == -1) return;
 
         int confirmacion = JOptionPane.showConfirmDialog(vista,
                 "¿Estás seguro de eliminar este cliente?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
         if (confirmacion != JOptionPane.YES_OPTION) return;
 
-        try {
+        try (EntityManager em = ConexionJPA.crearEntityManager()) {
+            long facturas = em.createQuery(
+                            "SELECT COUNT(f) FROM Factura f WHERE f.cliente.id = :id", Long.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+            if (facturas > 0) {
+                JOptionPane.showMessageDialog(vista,
+                        "No se puede eliminar: el cliente tiene " + facturas + " factura(s) registradas.");
+                return;
+            }
+
             em.getTransaction().begin();
             Cliente cliente = em.find(Cliente.class, id);
             if (cliente != null) em.remove(cliente);
             em.getTransaction().commit();
-
             JOptionPane.showMessageDialog(vista, "Cliente eliminado con éxito");
-            CLlistar();
-            cargarComboFacturas();
         } catch (RuntimeException ex) {
-            CLcancelarTransaccionSiNecesario();
             JOptionPane.showMessageDialog(vista, "No se pudo eliminar el cliente: " + ex.getMessage());
         }
+        CLlistar();
+        cargarComboFacturas();
     }
 
     public void CLlimpiar() {
@@ -151,26 +153,28 @@ public class ClientesControlador {
     }
 
     public List<Cliente> CLbuscarPorNombre(String nombre) {
-        return em.createQuery(
-                        "SELECT c FROM Cliente c WHERE LOWER(c.nombre) LIKE LOWER(:nombre) ORDER BY c.nombre",
-                        Cliente.class)
-                .setParameter("nombre", "%" + nombre + "%")
-                .getResultList();
+        try (EntityManager em = ConexionJPA.crearEntityManager()) {
+            return em.createQuery(
+                            "SELECT c FROM Cliente c WHERE LOWER(c.nombre) LIKE LOWER(:nombre) ORDER BY c.nombre",
+                            Cliente.class)
+                    .setParameter("nombre", "%" + nombre + "%")
+                    .getResultList();
+        }
     }
 
     public void CLbuscarYMostrar(String texto) {
-        DefaultTableModel modelo = new DefaultTableModel(
-                new String[]{"ID", "Nombre", "Apellido", "Cédula", "Teléfono", "Correo"}, 0);
-        List<Cliente> lista = CLbuscarPorNombre(texto);
-        for (Cliente c : lista) {
-            modelo.addRow(new Object[]{
-                    c.getId(), c.getNombre(), c.getApellido(), c.getCedula(), c.getTelefono(), c.getCorreo()
-            });
-        }
+        DefaultTableModel modelo = crearModelo();
+        llenar(modelo, CLbuscarPorNombre(texto));
         vista.tbl_CLClientes.setModel(modelo);
     }
 
-    private void CLcancelarTransaccionSiNecesario() {
-        if (em.getTransaction().isActive()) em.getTransaction().rollback();
+    private int idSeleccionado() {
+        int filaVista = vista.tbl_CLClientes.getSelectedRow();
+        if (filaVista < 0) {
+            JOptionPane.showMessageDialog(vista, "Selecciona un cliente de la tabla primero");
+            return -1;
+        }
+        int fila = vista.tbl_CLClientes.convertRowIndexToModel(filaVista);
+        return ((Number) vista.tbl_CLClientes.getValueAt(fila, 0)).intValue();
     }
 }

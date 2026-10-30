@@ -108,26 +108,30 @@ public class CategoriaControlador {
                 "¿Estás seguro de eliminar esta categoría?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
         if (confirmacion != JOptionPane.YES_OPTION) return;
 
-        EntityManager em = ConexionJPA.crearEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            int filasBorradas = em.createQuery("DELETE FROM Categoria c WHERE c.id = :id")
+        try (EntityManager em = ConexionJPA.crearEntityManager()) {
+            long productos = em.createQuery(
+                            "SELECT COUNT(p) FROM Productos p WHERE p.categoriaRelacion.id = :id", Long.class)
                     .setParameter("id", id)
-                    .executeUpdate();
-            tx.commit();
-
-            if (filasBorradas > 0) {
-                JOptionPane.showMessageDialog(vista, "Categoría eliminada con éxito");
-            } else {
-                JOptionPane.showMessageDialog(vista, "No se encontró la categoría para eliminar");
+                    .getSingleResult();
+            if (productos > 0) {
+                JOptionPane.showMessageDialog(vista,
+                        "No se puede eliminar: la categoría tiene " + productos + " producto(s).");
+                return;
             }
-            Clistar();
-        } catch (RuntimeException ex) {
-            if (tx.isActive()) tx.rollback();
-            JOptionPane.showMessageDialog(vista, "No se pudo eliminar la categoría: " + ex.getMessage());
-        } finally {
-            if (em.isOpen()) em.close();
+
+            EntityTransaction tx = em.getTransaction();
+            try {
+                tx.begin();
+                em.createQuery("DELETE FROM Categoria c WHERE c.id = :id")
+                        .setParameter("id", id)
+                        .executeUpdate();
+                tx.commit();
+                JOptionPane.showMessageDialog(vista, "Categoría eliminada con éxito");
+                Clistar();
+            } catch (RuntimeException ex) {
+                if (tx.isActive()) tx.rollback();
+                JOptionPane.showMessageDialog(vista, "No se pudo eliminar la categoría: " + ex.getMessage());
+            }
         }
     }
 
