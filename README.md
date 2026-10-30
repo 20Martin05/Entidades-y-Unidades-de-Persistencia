@@ -12,6 +12,7 @@ El desarrollo aplica el Mapeo Objeto-Relacional (ORM) con anotaciones estándar 
 * **Control de stock:** al guardar una factura se descuenta el stock; al actualizar se ajusta solo la diferencia; al eliminar, el stock vuelve a su valor anterior. Todo ocurre en una sola transacción.
 * **Pool de conexiones (HikariCP)** hacia PostgreSQL.
 * **Transacciones controladas** con `EntityManager` (`begin`, `commit`, `rollback`).
+* **Protección de datos al borrar:** una categoría no se elimina si tiene productos, y un cliente no se elimina si tiene facturas.
 * **Normalización de datos:** nombres de clientes y productos en formato título; correos de clientes en minúsculas.
 * **Recarga automática:** combos y tablas se actualizan tras cada operación.
 
@@ -58,17 +59,17 @@ src/main/
  │       │   └── VentanaEmpresa.form     # Diseño visual (IntelliJ GUI Designer)
  │       └── VentanaEmpresa.java         # Eventos y lógica de la ventana
  └── resources/
+     ├── images/
+     │   ├── pestañas/                   # Capturas de cada pestaña
+     │   └── Diagrama de Clases.png
      ├── META-INF/
      │   └── persistence.xml             # Unidad de persistencia "postgres"
      ├── sql/                            # Scripts SQL de cada tabla
      │   ├── Categoria.sql
      │   ├── Cliente.sql
+     │   ├── Productos.sql
      │   ├── Factura.sql
-     │   ├── FacturaDetalle.sql
-     │   └── Productos.sql
-     ├── images/
-     │   ├── pestañas/                   # Capturas de cada pestaña
-     │   └── Diagrama de Clases.png
+     │   └── FacturaDetalle.sql
      └── uml/                            # Diagrama UML (Visual Paradigm, .vpp)
 ```
 
@@ -87,7 +88,12 @@ Relaciones principales:
 * Una categoría tiene muchos productos (`Productos.categoriaRelacion`).
 * Un cliente tiene muchas facturas (`Factura.cliente`).
 * Una factura tiene muchas líneas; cada línea apunta a un producto (`FacturaDetalle.producto`).
-* Un producto no puede borrarse si aparece en una factura (`ON DELETE RESTRICT`).
+
+Reglas de integridad:
+
+* **Categoría:** no se puede eliminar mientras tenga productos (`ON DELETE RESTRICT`).
+* **Cliente:** no se puede eliminar mientras tenga facturas.
+* **Producto:** no se puede eliminar si aparece en una factura (`ON DELETE RESTRICT`).
 
 ## 🖼️ Evidencia de ejecución
 
@@ -120,7 +126,13 @@ cd Entidades-y-Unidades-de-Persistencia
 
 1. Inicia PostgreSQL en el puerto `5432`.
 2. Ejecuta los scripts de `src/main/resources/sql/` en este orden: `Categoria.sql`, `Cliente.sql`, `Productos.sql`, `Factura.sql`, `FacturaDetalle.sql`.
-3. Revisa la URL y el usuario en `src/main/resources/META-INF/persistence.xml`. La contraseña debe estar disponible para la aplicación.
+3. Si ya tenías la base creada antes de este cambio, ejecuta también:
+
+   ```sql
+   ALTER TABLE productos DROP CONSTRAINT fk_producto_categoria;
+   ALTER TABLE productos ADD CONSTRAINT fk_producto_categoria
+       FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE RESTRICT;
+   ```
 
 ### 3. Configurar y ejecutar el programa
 
@@ -147,4 +159,3 @@ mvn clean package
 * **Materia:** Persistencia de Datos
 * **Universidad:** Universidad Politécnica Salesiana
 * **Bloque:** Bloque I - Unidad 2 (Entidades y Unidades de Persistencia)
-   ```

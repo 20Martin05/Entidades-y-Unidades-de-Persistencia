@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "productos")
 @Getter
 @Setter
-@ToString(exclude = {"categoriaRelacion", "proveedor", "detalles"})
+@ToString(exclude = {"categoriaRelacion", "detalles"})
 public class Productos {
 
     @Id
