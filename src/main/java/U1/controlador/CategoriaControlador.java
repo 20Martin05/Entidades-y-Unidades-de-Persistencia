@@ -35,79 +35,54 @@ public class CategoriaControlador {
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            String nombre = String.valueOf(vista.cmb_CNombre.getSelectedItem());
-            String descripcion = vista.txt_CDescripcion.getText().trim();
-            Boolean estado = vista.cmb_CEstado.getSelectedIndex() == 0;
-            Categoria nuevo = new Categoria(0, nombre, descripcion, estado);
-
+            Categoria nuevo = new Categoria(0,
+                    String.valueOf(vista.cmb_CNombre.getSelectedItem()),
+                    vista.txt_CDescripcion.getText().trim(),
+                    vista.cmb_CEstado.getSelectedIndex() == 0);
             tx.begin();
             em.persist(nuevo);
             tx.commit();
-
             JOptionPane.showMessageDialog(vista, "Categoría guardada con éxito");
             Clistar();
-        } catch (NumberFormatException ex) {
+        } catch (Exception ex) {
             if (tx.isActive()) tx.rollback();
-            JOptionPane.showMessageDialog(vista, "La categoría no tiene datos válidos.");
-        } catch (RuntimeException ex) {
-            if (tx.isActive()) tx.rollback();
-            JOptionPane.showMessageDialog(vista, "No se pudo guardar la categoría: " + ex.getMessage());
+            JOptionPane.showMessageDialog(vista, "Error al guardar categoría: " + ex.getMessage());
         } finally {
             if (em.isOpen()) em.close();
         }
     }
 
     public void Cactualizar() {
-        int filaVista = vista.tbl_CCategorias.getSelectedRow();
-        int fila = filaVista >= 0 ? vista.tbl_CCategorias.convertRowIndexToModel(filaVista) : -1;
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona una categoría de la tabla primero");
-            return;
-        }
+        int id = idSeleccionado();
+        if (id == -1) return;
 
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            int id = ((Number) vista.tbl_CCategorias.getValueAt(fila, 0)).intValue();
-            String nuevoNombre = String.valueOf(vista.cmb_CNombre.getSelectedItem());
-            String nuevoDescripcion = vista.txt_CDescripcion.getText().trim();
-            Boolean nuevoEstado = vista.cmb_CEstado.getSelectedIndex() == 0;
-
             tx.begin();
             em.createQuery("UPDATE Categoria c SET c.nombre = :nombre, c.descripcion = :descripcion, c.estado = :estado WHERE c.id = :id")
-                    .setParameter("nombre", nuevoNombre)
-                    .setParameter("descripcion", nuevoDescripcion)
-                    .setParameter("estado", nuevoEstado)
+                    .setParameter("nombre", String.valueOf(vista.cmb_CNombre.getSelectedItem()))
+                    .setParameter("descripcion", vista.txt_CDescripcion.getText().trim())
+                    .setParameter("estado", vista.cmb_CEstado.getSelectedIndex() == 0)
                     .setParameter("id", id)
                     .executeUpdate();
             tx.commit();
-
             JOptionPane.showMessageDialog(vista, "Categoría actualizada con éxito");
             Clistar();
-        } catch (NumberFormatException ex) {
+        } catch (Exception ex) {
             if (tx.isActive()) tx.rollback();
-            JOptionPane.showMessageDialog(vista, "La categoría no tiene datos válidos.");
-        } catch (RuntimeException ex) {
-            if (tx.isActive()) tx.rollback();
-            JOptionPane.showMessageDialog(vista, "No se pudo actualizar la categoría: " + ex.getMessage());
+            JOptionPane.showMessageDialog(vista, "Error al actualizar categoría: " + ex.getMessage());
         } finally {
             if (em.isOpen()) em.close();
         }
     }
 
     public void Celiminar() {
-        int filaVista = vista.tbl_CCategorias.getSelectedRow();
-        int fila = filaVista >= 0 ? vista.tbl_CCategorias.convertRowIndexToModel(filaVista) : -1;
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona una categoría de la tabla primero");
-            return;
-        }
+        int id = idSeleccionado();
+        if (id == -1) return;
 
-        int id = ((Number) vista.tbl_CCategorias.getValueAt(fila, 0)).intValue();
-
-        int confirmacion = JOptionPane.showConfirmDialog(vista,
-                "¿Estás seguro de eliminar esta categoría?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirmacion != JOptionPane.YES_OPTION) return;
+        if (JOptionPane.showConfirmDialog(vista, "¿Estás seguro de eliminar esta categoría?",
+                "Confirmar eliminación", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
 
         try (EntityManager em = ConexionJPA.crearEntityManager()) {
             long productos = em.createQuery(
@@ -115,17 +90,14 @@ public class CategoriaControlador {
                     .setParameter("id", id)
                     .getSingleResult();
             if (productos > 0) {
-                JOptionPane.showMessageDialog(vista,
-                        "No se puede eliminar: la categoría tiene " + productos + " producto(s).");
+                JOptionPane.showMessageDialog(vista, "No se puede eliminar: la categoría tiene " + productos + " producto(s).");
                 return;
             }
 
             EntityTransaction tx = em.getTransaction();
             try {
                 tx.begin();
-                em.createQuery("DELETE FROM Categoria c WHERE c.id = :id")
-                        .setParameter("id", id)
-                        .executeUpdate();
+                em.createQuery("DELETE FROM Categoria c WHERE c.id = :id").setParameter("id", id).executeUpdate();
                 tx.commit();
                 JOptionPane.showMessageDialog(vista, "Categoría eliminada con éxito");
                 Clistar();
@@ -140,5 +112,14 @@ public class CategoriaControlador {
         vista.cmb_CNombre.setSelectedIndex(0);
         vista.txt_CDescripcion.setText("");
         vista.cmb_CEstado.setSelectedIndex(0);
+    }
+
+    private int idSeleccionado() {
+        int filaVista = vista.tbl_CCategorias.getSelectedRow();
+        if (filaVista < 0) {
+            JOptionPane.showMessageDialog(vista, "Selecciona una categoría de la tabla primero");
+            return -1;
+        }
+        return ((Number) vista.tbl_CCategorias.getValueAt(vista.tbl_CCategorias.convertRowIndexToModel(filaVista), 0)).intValue();
     }
 }

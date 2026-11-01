@@ -31,34 +31,34 @@ public class ProductosControlador {
         return sb.toString();
     }
 
-    public void Plistar() {
-        DefaultTableModel modelo = new DefaultTableModel(
-                new String[]{"ID", "Nombre", "Precio", "Cantidad", "categoria_id"}, 0);
-        vista.tbl_PProductos.setRowSorter(null);
-        vista.tbl_PProductos.setModel(modelo);
+    private DefaultTableModel crearModelo() {
+        return new DefaultTableModel(new String[]{"ID", "Nombre", "Precio", "Cantidad", "categoria_id"}, 0);
+    }
 
-        try (EntityManager em = ConexionJPA.crearEntityManager()) {
-            List<Productos> lista = em.createQuery("FROM Productos", Productos.class).getResultList();
-            for (Productos p : lista) {
-                Integer categoriaId = p.getCategoriaRelacion() == null
-                        ? null
-                        : p.getCategoriaRelacion().getId();
-                modelo.addRow(new Object[]{
-                        p.getId(), p.getNombre(), p.getPrecio(), p.getCantidad(), categoriaId
-                });
-            }
+    private void llenar(DefaultTableModel modelo, List<Productos> lista) {
+        for (Productos p : lista) {
+            Integer catId = p.getCategoriaRelacion() == null ? null : p.getCategoriaRelacion().getId();
+            modelo.addRow(new Object[]{p.getId(), p.getNombre(), p.getPrecio(), p.getCantidad(), catId});
         }
+    }
+
+    public void Plistar() {
+        DefaultTableModel modelo = crearModelo();
+        vista.tbl_PProductos.setRowSorter(null);
+        try (EntityManager em = ConexionJPA.crearEntityManager()) {
+            llenar(modelo, em.createQuery("FROM Productos", Productos.class).getResultList());
+        }
+        vista.tbl_PProductos.setModel(modelo);
     }
 
     public void Pguardar() {
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            String nombre = capitalizar(vista.txt_PNombre.getText());
-            BigDecimal precio = new BigDecimal(vista.txt_PPrecio.getText().trim());
-            int cantidad = Integer.parseInt(vista.txt_PCantidad.getText().trim());
-
-            Productos nuevo = new Productos(0, nombre, precio, cantidad);
+            Productos nuevo = new Productos(0,
+                    capitalizar(vista.txt_PNombre.getText()),
+                    new BigDecimal(vista.txt_PPrecio.getText().trim()),
+                    Integer.parseInt(vista.txt_PCantidad.getText().trim()));
             nuevo.setCategoriaRelacion(categoriaSeleccionada(em));
 
             tx.begin();
@@ -79,27 +79,18 @@ public class ProductosControlador {
     }
 
     public void Pactualizar() {
-        int filaVista = vista.tbl_PProductos.getSelectedRow();
-        int fila = filaVista >= 0 ? vista.tbl_PProductos.convertRowIndexToModel(filaVista) : -1;
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona un producto de la tabla primero");
-            return;
-        }
+        int id = idSeleccionado();
+        if (id == -1) return;
 
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            int id = ((Number) vista.tbl_PProductos.getValueAt(fila, 0)).intValue();
-            String nuevoNombre = capitalizar(vista.txt_PNombre.getText());
-            BigDecimal nuevoPrecio = new BigDecimal(vista.txt_PPrecio.getText().trim());
-            int nuevaCantidad = Integer.parseInt(vista.txt_PCantidad.getText().trim());
-
             tx.begin();
             Productos producto = em.find(Productos.class, id);
             if (producto != null) {
-                producto.setNombre(nuevoNombre);
-                producto.setPrecio(nuevoPrecio);
-                producto.setCantidad(nuevaCantidad);
+                producto.setNombre(capitalizar(vista.txt_PNombre.getText()));
+                producto.setPrecio(new BigDecimal(vista.txt_PPrecio.getText().trim()));
+                producto.setCantidad(Integer.parseInt(vista.txt_PCantidad.getText().trim()));
                 producto.setCategoriaRelacion(categoriaSeleccionada(em));
             }
             tx.commit();
@@ -122,23 +113,15 @@ public class ProductosControlador {
         if (seleccion == null || seleccion.toString().isBlank()) return null;
         return em.createQuery("FROM Categoria c WHERE c.nombre = :nombre", Categoria.class)
                 .setParameter("nombre", seleccion.toString())
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
+                .getResultStream().findFirst().orElse(null);
     }
 
     public void Peliminar() {
-        int filaVista = vista.tbl_PProductos.getSelectedRow();
-        int fila = filaVista >= 0 ? vista.tbl_PProductos.convertRowIndexToModel(filaVista) : -1;
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(vista, "Selecciona un producto de la tabla primero");
-            return;
-        }
+        int id = idSeleccionado();
+        if (id == -1) return;
 
-        int id = ((Number) vista.tbl_PProductos.getValueAt(fila, 0)).intValue();
-        int confirmacion = JOptionPane.showConfirmDialog(vista,
-                "¿Estás seguro de eliminar este producto?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirmacion != JOptionPane.YES_OPTION) return;
+        if (JOptionPane.showConfirmDialog(vista, "¿Estás seguro de eliminar este producto?",
+                "Confirmar eliminación", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
 
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -166,25 +149,24 @@ public class ProductosControlador {
 
     public List<Productos> PbuscarPorNombre(String nombre) {
         try (EntityManager em = ConexionJPA.crearEntityManager()) {
-            return em.createQuery(
-                            "SELECT p FROM Productos p WHERE LOWER(p.nombre) LIKE LOWER(:nombre) ORDER BY p.nombre",
-                            Productos.class)
+            return em.createQuery("SELECT p FROM Productos p WHERE LOWER(p.nombre) LIKE LOWER(:nombre) ORDER BY p.nombre", Productos.class)
                     .setParameter("nombre", "%" + nombre + "%")
                     .getResultList();
         }
     }
 
     public void PbuscarYMostrar(String texto) {
-        DefaultTableModel modelo = new DefaultTableModel(
-                new String[]{"ID", "Nombre", "Precio", "Cantidad", "categoria_id"}, 0);
-        for (Productos p : PbuscarPorNombre(texto)) {
-            Integer categoriaId = p.getCategoriaRelacion() == null
-                    ? null
-                    : p.getCategoriaRelacion().getId();
-            modelo.addRow(new Object[]{
-                    p.getId(), p.getNombre(), p.getPrecio(), p.getCantidad(), categoriaId
-            });
-        }
+        DefaultTableModel modelo = crearModelo();
+        llenar(modelo, PbuscarPorNombre(texto));
         vista.tbl_PProductos.setModel(modelo);
+    }
+
+    private int idSeleccionado() {
+        int filaVista = vista.tbl_PProductos.getSelectedRow();
+        if (filaVista < 0) {
+            JOptionPane.showMessageDialog(vista, "Selecciona un producto de la tabla primero");
+            return -1;
+        }
+        return ((Number) vista.tbl_PProductos.getValueAt(vista.tbl_PProductos.convertRowIndexToModel(filaVista), 0)).intValue();
     }
 }
