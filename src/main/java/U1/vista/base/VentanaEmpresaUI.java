@@ -6,6 +6,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import javax.swing.*;
 import java.awt.*;
 
+@SuppressWarnings("unchecked")
 public class VentanaEmpresaUI extends JFrame {
     public JPanel PanelPrincipal;
 

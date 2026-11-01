@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class FacturaControlador {
     private final VentanaEmpresa vista;
 

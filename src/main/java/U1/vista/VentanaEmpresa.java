@@ -12,6 +12,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.util.Comparator;
 
+@SuppressWarnings("unchecked")
 public class VentanaEmpresa extends VentanaEmpresaUI {
 
     private final ProductosControlador Pcontrolador;

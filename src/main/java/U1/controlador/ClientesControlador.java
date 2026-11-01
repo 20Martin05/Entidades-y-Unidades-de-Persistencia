@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class ClientesControlador {
     private final VentanaEmpresa vista;
 

@@ -12,6 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class ProductosControlador {
     private final VentanaEmpresa vista;
 
