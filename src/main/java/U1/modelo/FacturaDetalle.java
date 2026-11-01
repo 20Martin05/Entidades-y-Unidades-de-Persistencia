@@ -1,18 +1,12 @@
 package U1.modelo;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "factura_detalle",
         uniqueConstraints = @UniqueConstraint(columnNames = {"factura_id", "producto_id"}))
-@Getter
-@Setter
-@ToString(exclude = {"factura", "producto"})
 public class FacturaDetalle {
 
     @Id
@@ -33,8 +27,7 @@ public class FacturaDetalle {
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
 
-    public FacturaDetalle() {
-    }
+    public FacturaDetalle() {}
 
     public FacturaDetalle(Factura factura, Productos producto, int cantidad, BigDecimal precioUnitario) {
         this.factura = factura;
@@ -43,7 +36,27 @@ public class FacturaDetalle {
         this.precioUnitario = precioUnitario;
     }
 
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public Factura getFactura() { return factura; }
+    public void setFactura(Factura factura) { this.factura = factura; }
+
+    public Productos getProducto() { return producto; }
+    public void setProducto(Productos producto) { this.producto = producto; }
+
+    public int getCantidad() { return cantidad; }
+    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+
+    public BigDecimal getPrecioUnitario() { return precioUnitario; }
+    public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
+
     public BigDecimal getSubtotalLinea() {
         return precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+    }
+
+    @Override
+    public String toString() {
+        return "FacturaDetalle{id=" + id + ", cantidad=" + cantidad + "}";
     }
 }
