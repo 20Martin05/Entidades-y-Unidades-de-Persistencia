@@ -53,7 +53,7 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Lombok disponible para reducir código repetitivo en futuras entidades. -->
+        <!-- Lombok  -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

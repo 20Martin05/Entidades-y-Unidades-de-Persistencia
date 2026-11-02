@@ -1,6 +1,9 @@
 package U1.modelo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -8,6 +11,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "productos")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Productos {
 
     @Id
@@ -29,33 +35,6 @@ public class Productos {
 
     @OneToMany(mappedBy = "producto")
     private List<FacturaDetalle> detalles = new ArrayList<>();
-
-    public Productos() {}
-
-    public Productos(int id, String nombre, BigDecimal precio, int cantidad) {
-        this.id = id;
-        this.nombre = nombre;
-        this.precio = precio;
-        this.cantidad = cantidad;
-    }
-
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public BigDecimal getPrecio() { return precio; }
-    public void setPrecio(BigDecimal precio) { this.precio = precio; }
-
-    public int getCantidad() { return cantidad; }
-    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
-
-    public Categoria getCategoriaRelacion() { return categoriaRelacion; }
-    public void setCategoriaRelacion(Categoria categoriaRelacion) { this.categoriaRelacion = categoriaRelacion; }
-
-    public List<FacturaDetalle> getDetalles() { return detalles; }
-    public void setDetalles(List<FacturaDetalle> detalles) { this.detalles = detalles; }
 
     @Override
     public String toString() {

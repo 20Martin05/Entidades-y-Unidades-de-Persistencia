@@ -1,12 +1,18 @@
 package U1.modelo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "categorias")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Categoria {
 
     @Id
@@ -24,30 +30,6 @@ public class Categoria {
 
     @OneToMany(mappedBy = "categoriaRelacion")
     private Set<Productos> productos = new HashSet<>();
-
-    public Categoria() {}
-
-    public Categoria(int id, String nombre, String descripcion, boolean estado) {
-        this.id = id;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.estado = estado;
-    }
-
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-
-    public boolean isEstado() { return estado; }
-    public void setEstado(boolean estado) { this.estado = estado; }
-
-    public Set<Productos> getProductos() { return productos; }
-    public void setProductos(Set<Productos> productos) { this.productos = productos; }
 
     @Override
     public String toString() {

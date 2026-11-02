@@ -10,7 +10,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 public class CategoriaControlador {
     private final VentanaEmpresa vista;
 
@@ -31,14 +30,25 @@ public class CategoriaControlador {
         }
     }
 
+    private boolean nombreValido() {
+        if (vista.cmb_CNombre.getSelectedItem() == null
+                || vista.cmb_CNombre.getSelectedItem().toString().isBlank()) {
+            JOptionPane.showMessageDialog(vista, "Selecciona un nombre de categoría.");
+            return false;
+        }
+        return true;
+    }
+
     public void Cguardar() {
+        if (!nombreValido()) return;
+
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            Categoria nuevo = new Categoria(0,
-                    String.valueOf(vista.cmb_CNombre.getSelectedItem()),
-                    vista.txt_CDescripcion.getText().trim(),
-                    vista.cmb_CEstado.getSelectedIndex() == 0);
+            Categoria nuevo = new Categoria();
+            nuevo.setNombre(vista.cmb_CNombre.getSelectedItem().toString());
+            nuevo.setDescripcion(vista.txt_CDescripcion.getText().trim());
+            nuevo.setEstado(vista.cmb_CEstado.getSelectedIndex() == 0);
             tx.begin();
             em.persist(nuevo);
             tx.commit();
@@ -55,17 +65,17 @@ public class CategoriaControlador {
     public void Cactualizar() {
         int id = idSeleccionado();
         if (id == -1) return;
+        if (!nombreValido()) return;
 
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.createQuery("UPDATE Categoria c SET c.nombre = :nombre, c.descripcion = :descripcion, c.estado = :estado WHERE c.id = :id")
-                    .setParameter("nombre", String.valueOf(vista.cmb_CNombre.getSelectedItem()))
-                    .setParameter("descripcion", vista.txt_CDescripcion.getText().trim())
-                    .setParameter("estado", vista.cmb_CEstado.getSelectedIndex() == 0)
-                    .setParameter("id", id)
-                    .executeUpdate();
+            Categoria categoria = em.find(Categoria.class, id);
+            if (categoria == null) throw new IllegalStateException("La categoría ya no existe");
+            categoria.setNombre(vista.cmb_CNombre.getSelectedItem().toString());
+            categoria.setDescripcion(vista.txt_CDescripcion.getText().trim());
+            categoria.setEstado(vista.cmb_CEstado.getSelectedIndex() == 0);
             tx.commit();
             JOptionPane.showMessageDialog(vista, "Categoría actualizada con éxito");
             Clistar();

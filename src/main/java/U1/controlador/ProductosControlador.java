@@ -12,7 +12,6 @@ import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 public class ProductosControlador {
     private final VentanaEmpresa vista;
 
@@ -51,14 +50,27 @@ public class ProductosControlador {
         vista.tbl_PProductos.setModel(modelo);
     }
 
+    private boolean camposValidos(String nombre, String precio, String cantidad) {
+        if (nombre.isBlank() || precio.isBlank() || cantidad.isBlank()) {
+            JOptionPane.showMessageDialog(vista, "Nombre, precio y cantidad son obligatorios.");
+            return false;
+        }
+        return true;
+    }
+
     public void Pguardar() {
+        String nombre = vista.txt_PNombre.getText().trim();
+        String precio = vista.txt_PPrecio.getText().trim();
+        String cantidad = vista.txt_PCantidad.getText().trim();
+        if (!camposValidos(nombre, precio, cantidad)) return;
+
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            Productos nuevo = new Productos(0,
-                    capitalizar(vista.txt_PNombre.getText()),
-                    new BigDecimal(vista.txt_PPrecio.getText().trim()),
-                    Integer.parseInt(vista.txt_PCantidad.getText().trim()));
+            Productos nuevo = new Productos();
+            nuevo.setNombre(capitalizar(nombre));
+            nuevo.setPrecio(new BigDecimal(precio));
+            nuevo.setCantidad(Integer.parseInt(cantidad));
             nuevo.setCategoriaRelacion(categoriaSeleccionada(em));
 
             tx.begin();
@@ -82,17 +94,21 @@ public class ProductosControlador {
         int id = idSeleccionado();
         if (id == -1) return;
 
+        String nombre = vista.txt_PNombre.getText().trim();
+        String precio = vista.txt_PPrecio.getText().trim();
+        String cantidad = vista.txt_PCantidad.getText().trim();
+        if (!camposValidos(nombre, precio, cantidad)) return;
+
         EntityManager em = ConexionJPA.crearEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
             Productos producto = em.find(Productos.class, id);
-            if (producto != null) {
-                producto.setNombre(capitalizar(vista.txt_PNombre.getText()));
-                producto.setPrecio(new BigDecimal(vista.txt_PPrecio.getText().trim()));
-                producto.setCantidad(Integer.parseInt(vista.txt_PCantidad.getText().trim()));
-                producto.setCategoriaRelacion(categoriaSeleccionada(em));
-            }
+            if (producto == null) throw new IllegalStateException("El producto ya no existe");
+            producto.setNombre(capitalizar(nombre));
+            producto.setPrecio(new BigDecimal(precio));
+            producto.setCantidad(Integer.parseInt(cantidad));
+            producto.setCategoriaRelacion(categoriaSeleccionada(em));
             tx.commit();
 
             JOptionPane.showMessageDialog(vista, "Actualizado con éxito");

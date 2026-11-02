@@ -60,12 +60,22 @@ public class ClientesControlador {
         }
     }
 
+    private boolean camposValidos(String nombre, String apellido, String cedula) {
+        if (nombre.isBlank() || apellido.isBlank() || cedula.isBlank()) {
+            JOptionPane.showMessageDialog(vista, "Nombre, apellido y cédula son obligatorios.");
+            return false;
+        }
+        return true;
+    }
+
     public void CLguardar() {
         String nombre = capitalizar(vista.txt_CLNombre.getText());
         String apellido = capitalizar(vista.txt_CLApellido.getText());
         String cedula = vista.txt_CLCedula.getText().trim();
         String telefono = vista.txt_CLTelefono.getText().trim();
         String correo = vista.txt_CLCorreo.getText().trim().toLowerCase();
+
+        if (!camposValidos(nombre, apellido, cedula)) return;
 
         try (EntityManager em = ConexionJPA.crearEntityManager()) {
             Cliente nuevo = new Cliente();
@@ -95,6 +105,8 @@ public class ClientesControlador {
         String nuevaCedula = vista.txt_CLCedula.getText().trim();
         String nuevoTelefono = vista.txt_CLTelefono.getText().trim();
         String nuevoCorreo = vista.txt_CLCorreo.getText().trim().toLowerCase();
+
+        if (!camposValidos(nuevoNombre, nuevoApellido, nuevaCedula)) return;
 
         try (EntityManager em = ConexionJPA.crearEntityManager()) {
             em.getTransaction().begin();

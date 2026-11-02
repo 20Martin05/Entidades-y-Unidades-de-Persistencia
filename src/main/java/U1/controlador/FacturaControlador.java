@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 public class FacturaControlador {
     private final VentanaEmpresa vista;
 
@@ -74,7 +73,10 @@ public class FacturaControlador {
             Productos p = productoSeleccionado(em);
             int cantidad = leerCantidad();
             descontarStock(p, cantidad);
-            em.persist(new FacturaDetalle(f, p, cantidad, p.getPrecio()));
+
+            FacturaDetalle linea = crearDetalle(f, p, cantidad);
+            f.getDetalles().add(linea);
+            em.persist(linea);
 
             tx.commit();
             JOptionPane.showMessageDialog(vista, "Factura guardada con éxito");
@@ -87,6 +89,8 @@ public class FacturaControlador {
         }
     }
 
+    // Nota: la factura se trata como de una sola línea. Si necesitas varias,
+    // hay que cambiar la lógica para actualizar o crear cada detalle.
     public void Factualizar() {
         int id = idSeleccionado();
         if (id == -1) return;
@@ -109,7 +113,9 @@ public class FacturaControlador {
             descontarStock(p, cantidad);
 
             if (detalle == null) {
-                em.persist(new FacturaDetalle(f, p, cantidad, p.getPrecio()));
+                FacturaDetalle linea = crearDetalle(f, p, cantidad);
+                f.getDetalles().add(linea);
+                em.persist(linea);
             } else {
                 detalle.setProducto(p);
                 detalle.setCantidad(cantidad);
@@ -203,6 +209,15 @@ public class FacturaControlador {
         DefaultTableModel modelo = crearModelo();
         llenar(modelo, FbuscarPorCliente(texto));
         vista.tbl_FFacturas.setModel(modelo);
+    }
+
+    private FacturaDetalle crearDetalle(Factura f, Productos p, int cantidad) {
+        FacturaDetalle linea = new FacturaDetalle();
+        linea.setFactura(f);
+        linea.setProducto(p);
+        linea.setCantidad(cantidad);
+        linea.setPrecioUnitario(p.getPrecio());
+        return linea;
     }
 
     private void leerCabecera(EntityManager em, Factura f) {

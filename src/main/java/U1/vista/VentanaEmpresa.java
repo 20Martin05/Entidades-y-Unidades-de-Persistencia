@@ -13,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unchecked")
 public class VentanaEmpresa extends VentanaEmpresaUI {
 
     private final ProductosControlador Pcontrolador;
@@ -57,9 +56,20 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
         configurarEventosTablas();
     }
 
+    /**
+     * Ordena por la columna 0 como número. Solo se aplica a tablas cuya
+     * columna 0 es el ID (entero). Si el valor no es numérico, se trata como 0
+     * para evitar NumberFormatException durante el ordenamiento.
+     */
     private void configurarSorter(JTable tabla) {
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>((DefaultTableModel) tabla.getModel());
-        sorter.setComparator(0, Comparator.comparingInt(valor -> Integer.parseInt(valor.toString())));
+        sorter.setComparator(0, Comparator.comparingInt(valor -> {
+            try {
+                return Integer.parseInt(valor.toString());
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }));
         tabla.setRowSorter(sorter);
     }
 
@@ -135,9 +145,9 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
                 int filaVista = tbl_PProductos.getSelectedRow();
                 if (filaVista >= 0) {
                     int fila = tbl_PProductos.convertRowIndexToModel(filaVista);
-                    txt_PNombre.setText(String.valueOf(tbl_PProductos.getValueAt(fila, 1)));
-                    txt_PPrecio.setText(String.valueOf(tbl_PProductos.getValueAt(fila, 2)));
-                    txt_PCantidad.setText(String.valueOf(tbl_PProductos.getValueAt(fila, 3)));
+                    txt_PNombre.setText(valorCelda(tbl_PProductos, fila, 1));
+                    txt_PPrecio.setText(valorCelda(tbl_PProductos, fila, 2));
+                    txt_PCantidad.setText(valorCelda(tbl_PProductos, fila, 3));
                 }
             }
         });
@@ -148,10 +158,10 @@ public class VentanaEmpresa extends VentanaEmpresaUI {
                 int filaVista = tbl_CCategorias.getSelectedRow();
                 if (filaVista >= 0) {
                     int fila = tbl_CCategorias.convertRowIndexToModel(filaVista);
-                    boolean estado = Boolean.parseBoolean(String.valueOf(tbl_CCategorias.getValueAt(fila, 3)));
+                    boolean estado = Boolean.parseBoolean(valorCelda(tbl_CCategorias, fila, 3));
                     cmb_CEstado.setSelectedIndex(estado ? 0 : 1);
-                    cmb_CNombre.setSelectedItem(String.valueOf(tbl_CCategorias.getValueAt(fila, 1)));
-                    txt_CDescripcion.setText(String.valueOf(tbl_CCategorias.getValueAt(fila, 2)));
+                    cmb_CNombre.setSelectedItem(valorCelda(tbl_CCategorias, fila, 1));
+                    txt_CDescripcion.setText(valorCelda(tbl_CCategorias, fila, 2));
                 }
             }
         });

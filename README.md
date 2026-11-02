@@ -2,18 +2,18 @@
 
 Proyecto de Persistencia de Datos (U2) que implementa un sistema CRUD para gestionar categorías, productos, clientes y facturas de una tienda, con Java, Maven, interfaz gráfica Swing y persistencia relacional en **PostgreSQL** mediante **Jakarta Persistence (JPA)** y el framework **Hibernate ORM**.
 
-El desarrollo aplica el Mapeo Objeto-Relacional (ORM) con anotaciones estándar de JPA y gestiona sesiones y transacciones mediante `EntityManager`, para garantizar la integridad de los datos en cada operación de lectura y escritura.
+El desarrollo aplica el Mapeo Objeto-Relacional (ORM) con anotaciones estándar de JPA y gestiona sesiones y transacciones mediante `EntityManager`.
 
 ## ⚙️ Características Técnicas
 
-* **CRUD completo** para categorías, productos, clientes y facturas (`persist`, `createQuery`, `find`, `remove`).
+* **CRUD** para categorías, productos, clientes y facturas (`persist`, `createQuery`, `find`, `remove`).
 * **Mapeo Objeto-Relacional (ORM):** anotaciones JPA (`@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@ManyToOne`, `@OneToMany`, `@JoinColumn`).
 * **Líneas de factura:** la entidad `FacturaDetalle` guarda producto, cantidad y precio unitario por línea.
-* **Control de stock:** al guardar una factura se descuenta el stock; al actualizar se ajusta solo la diferencia; al eliminar, el stock vuelve a su valor anterior. Todo ocurre en una sola transacción.
-* **Pool de conexiones (HikariCP)** hacia PostgreSQL.
+* **Control de stock:** al guardar una factura se descuenta el stock del producto; al actualizar la factura se devuelve el stock de la línea anterior y se descuenta el de la nueva; al eliminar, el stock vuelve a su valor anterior. Cada operación ocurre en una sola transacción.
+* **Pool de conexiones** configurado en `persistence.xml` (ver nota en la sección de configuración).
 * **Transacciones controladas** con `EntityManager` (`begin`, `commit`, `rollback`).
 * **Protección de datos al borrar:** una categoría no se elimina si tiene productos, y un cliente no se elimina si tiene facturas.
-* **Normalización de datos:** nombres de clientes y productos en formato título; correos de clientes en minúsculas.
+* **Normalización de datos:** nombres de clientes y de productos en formato título; correos de clientes en minúsculas.
 * **Recarga automática:** combos y tablas se actualizan tras cada operación.
 
 ## 🛠️ Requisitos Previos
@@ -31,7 +31,7 @@ El desarrollo aplica el Mapeo Objeto-Relacional (ORM) con anotaciones estándar 
 | Hibernate ORM | 7.4.13.Final | Implementación de JPA |
 | PostgreSQL JDBC | 42.7.14 | Conexión a la base de datos |
 | HikariCP | 7.1.0 | Pool de conexiones |
-| Lombok | 1.18.48 | Getters y setters |
+| Lombok | 1.18.48 | Dependencia declarada en el proyecto |
 | forms_rt | 7.0.3 | Runtime de formularios Swing |
 
 ## 📂 Estructura del Proyecto
@@ -80,7 +80,7 @@ src/main/
 | `categorias`      | Categorías de productos                                 |
 | `productos`       | Productos con precio, stock y categoría                 |
 | `clientes`        | Clientes con cédula única                               |
-| `facturas`        | Cabecera de factura (número único, fecha, totales)      |
+| `facturas`        | Cabecera de factura (número único, fecha, subtotal, impuesto y total) |
 | `factura_detalle` | Líneas de factura: producto, cantidad y precio unitario |
 
 Relaciones principales:
@@ -91,9 +91,9 @@ Relaciones principales:
 
 Reglas de integridad:
 
-* **Categoría:** no se puede eliminar mientras tenga productos (`ON DELETE RESTRICT`).
-* **Cliente:** no se puede eliminar mientras tenga facturas.
-* **Producto:** no se puede eliminar si aparece en una factura (`ON DELETE RESTRICT`).
+* **Categoría:** no se puede eliminar mientras tenga productos. La aplicación lo verifica antes de borrar.
+* **Cliente:** no se puede eliminar mientras tenga facturas. La aplicación lo verifica antes de borrar.
+* **Producto:** no se puede eliminar si aparece en una factura (`ON DELETE RESTRICT` en la base de datos). En ese caso la aplicación muestra el error devuelto por PostgreSQL.
 
 ## 🖼️ Evidencia de ejecución
 
@@ -141,6 +141,8 @@ cd Entidades-y-Unidades-de-Persistencia
 3. Recarga las dependencias Maven.
 4. Ejecuta la clase principal `U1.Main`.
 
+Para compilar y empaquetar desde la terminal:
+
 ```bash
 mvn clean package
 ```
@@ -148,9 +150,9 @@ mvn clean package
 ### Uso de la interfaz
 
 * **Categoría:** elige el nombre y el estado, escribe la descripción y pulsa **Guardar**. Selecciona una fila para editarla o eliminarla.
-* **Productos:** asigna una categoría y escribe nombre, precio y cantidad. Los nombres se capitalizan al guardar.
-* **Factura:** elige cliente y producto, escribe número, fecha (`AAAA-MM-DD`), cantidad, subtotal e impuesto. El total se calcula como subtotal + impuesto. Al guardar, el stock del producto baja por la cantidad.
-* **Cliente:** completa los datos; los nombres se capitalizan y el correo se guarda en minúsculas.
+* **Productos:** asigna una categoría y escribe nombre, precio y cantidad. Los nombres se capitalizan al guardar. Todos los campos son obligatorios.
+* **Factura:** elige cliente y producto, escribe número, fecha (`AAAA-MM-DD`), cantidad, subtotal, impuesto y total. El total se introduce manualmente en el formulario. Al guardar, el stock del producto baja por la cantidad.
+* **Cliente:** completa nombre, apellido y cédula (obligatorios), y opcionalmente teléfono y correo. Los nombres se capitalizan y el correo se guarda en minúsculas.
 * **Buscadores:** filtran productos, facturas (por cliente) y clientes por nombre.
 
 ## 👤 Autor
