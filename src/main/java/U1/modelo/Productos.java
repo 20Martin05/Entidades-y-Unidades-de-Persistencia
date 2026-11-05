@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +22,8 @@ public class Productos {
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal precio;
+    @Column(nullable = false)
+    private double precio;
 
     @Column(nullable = false)
     private int cantidad;

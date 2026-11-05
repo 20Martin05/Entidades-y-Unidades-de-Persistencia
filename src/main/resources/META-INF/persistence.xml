@@ -15,10 +15,10 @@
 
         <properties>
             <!-- Datos de conexión a PostgreSQL -->
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/TU_BASE_DE_DATOS"/>
-            <property name="jakarta.persistence.jdbc.user" value="TU_USUARIO"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/Persistencia de Datos"/>
+            <property name="jakarta.persistence.jdbc.user" value="Martin"/>
             <!-- Reemplazar este marcador por la contraseña local de PostgreSQL. -->
-            <property name="jakarta.persistence.jdbc.password" value="TU_CONTRASEÑA"/>
+            <property name="jakarta.persistence.jdbc.password" value="Martin2005"/>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
 
             <!-- Propiedades de Hibernate -->

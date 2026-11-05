@@ -9,7 +9,6 @@ import jakarta.persistence.EntityTransaction;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.math.BigDecimal;
 import java.util.List;
 
 public class ProductosControlador {
@@ -69,7 +68,7 @@ public class ProductosControlador {
         try {
             Productos nuevo = new Productos();
             nuevo.setNombre(capitalizar(nombre));
-            nuevo.setPrecio(new BigDecimal(precio));
+            nuevo.setPrecio(Double.parseDouble(precio));
             nuevo.setCantidad(Integer.parseInt(cantidad));
             nuevo.setCategoriaRelacion(categoriaSeleccionada(em));
 
@@ -106,7 +105,7 @@ public class ProductosControlador {
             Productos producto = em.find(Productos.class, id);
             if (producto == null) throw new IllegalStateException("El producto ya no existe");
             producto.setNombre(capitalizar(nombre));
-            producto.setPrecio(new BigDecimal(precio));
+            producto.setPrecio(Double.parseDouble(precio));
             producto.setCantidad(Integer.parseInt(cantidad));
             producto.setCategoriaRelacion(categoriaSeleccionada(em));
             tx.commit();

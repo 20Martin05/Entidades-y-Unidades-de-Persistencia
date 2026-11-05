@@ -119,7 +119,7 @@ public class FacturaControlador {
             } else {
                 detalle.setProducto(p);
                 detalle.setCantidad(cantidad);
-                detalle.setPrecioUnitario(p.getPrecio());
+                detalle.setPrecioUnitario(BigDecimal.valueOf(p.getPrecio()));
             }
 
             tx.commit();
@@ -216,7 +216,7 @@ public class FacturaControlador {
         linea.setFactura(f);
         linea.setProducto(p);
         linea.setCantidad(cantidad);
-        linea.setPrecioUnitario(p.getPrecio());
+        linea.setPrecioUnitario(BigDecimal.valueOf(p.getPrecio()));
         return linea;
     }
 
