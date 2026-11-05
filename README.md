@@ -137,7 +137,12 @@ cd Entidades-y-Unidades-de-Persistencia
 ### 3. Configurar y ejecutar el programa
 
 1. Abre la carpeta clonada en IntelliJ IDEA, Eclipse, NetBeans o VS Code como proyecto Maven.
-2. Dirígete a `src/main/resources/META-INF/persistence.xml` y reemplaza `PON_AQUI_TU_CONTRASEÑA` por la contraseña local de tu usuario `postgres`.
+2. Dirígete a `src/main/resources/META-INF/persistence.xml` y actualiza los parámetros de conexión con los datos de tu propia instancia local de base de datos:
+```
+<property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/TU_BASE_DE_DATOS"/>
+<property name="jakarta.persistence.jdbc.user" value="TU_USUARIO"/>
+<property name="jakarta.persistence.jdbc.password" value="TU_CONTRASEÑA"/>
+```
 3. Recarga las dependencias Maven.
 4. Ejecuta la clase principal `U1.Main`.
 

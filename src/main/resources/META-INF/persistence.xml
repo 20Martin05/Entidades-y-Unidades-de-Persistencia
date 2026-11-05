@@ -4,7 +4,7 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd">
 
     <!-- Unidad JPA usada por la aplicación para conectarse a PostgreSQL. -->
-    <persistence-unit name="postgres" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="TU_CONTRASENA" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <!-- Entidad que Hibernate registra y mapea a la tabla productos. -->
         <class>U1.modelo.Productos</class>
@@ -15,10 +15,10 @@
 
         <properties>
             <!-- Datos de conexión a PostgreSQL -->
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/postgres"/>
-            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/TU_CONTRASEÑA"/>
+            <property name="jakarta.persistence.jdbc.user" value="TU_USUARIO"/>
             <!-- Reemplazar este marcador por la contraseña local de PostgreSQL. -->
-            <property name="jakarta.persistence.jdbc.password" value="PON_AQUI_TU_CONTRASEÑA"/>
+            <property name="jakarta.persistence.jdbc.password" value="TU_CONTRASENA"/>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
 
             <!-- Propiedades de Hibernate -->
